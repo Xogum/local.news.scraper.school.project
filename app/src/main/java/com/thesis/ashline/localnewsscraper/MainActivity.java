@@ -1,9 +1,12 @@
 package com.thesis.ashline.localnewsscraper;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.thesis.ashline.localnewsscraper.views.ArticleListActivity;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -27,13 +30,20 @@ public class MainActivity extends ActionBarActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch(item.getItemId()){
+            case R.id.action_settings:
+                return true;
+            case R.id.action_activity_list:
+                openArticleList();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
+    }
 
-        return super.onOptionsItemSelected(item);
+    private void openArticleList() {
+        Intent intent = new Intent(this, ArticleListActivity.class);
+
+        startActivity(intent);
     }
 }
