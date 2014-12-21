@@ -1,4 +1,4 @@
-package com.thesis.ashline.localnewsscraper;
+package com.thesis.ashline.localnewsscraper.api;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
