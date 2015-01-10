@@ -1,30 +1,42 @@
-package com.thesis.ashline.localnewsscraper.views;
+package com.thesis.ashline.localnewsscraper.view;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.android.volley.Cache;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.thesis.ashline.localnewsscraper.R;
+import com.thesis.ashline.localnewsscraper.adapter.FeedListAdapter;
+import com.thesis.ashline.localnewsscraper.api.AppController;
+import com.thesis.ashline.localnewsscraper.model.FeedItem;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ArticleListActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -126,6 +138,13 @@ public class ArticleListActivity extends ActionBarActivity
          * Textview in main fragment
          */
         private TextView textView;
+        private ListView listView;
+        private FeedListAdapter listAdapter;
+        private List<FeedItem> feedItems;
+        private String URL_FEED = "http://api.androidhive.info/feed/feed.json";
+        private Context applicationContext;
+        private static final String TAG = ArticleListActivity.class.getSimpleName();
+
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -147,30 +166,91 @@ public class ArticleListActivity extends ActionBarActivity
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_article_list, container, false);
-            textView = (TextView) rootView.findViewById(R.id.section_label);
+            applicationContext = this.getActivity().getApplicationContext();
+            listView = (ListView)rootView.findViewById(R.id.list);
 
-// Instantiate the RequestQueue.
-            RequestQueue queue = Volley.newRequestQueue(this.getActivity().getApplicationContext());
-            String url = "http://thesisapi-afromwana.rhcloud.com/";
+            feedItems = new ArrayList<FeedItem>();
 
-// Request a string response from the provided URL.
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                    new Response.Listener() {
-                        @Override
-                        public void onResponse(Object response) {
-                            String res = (String)response;
-                            // Display the first 500 characters of the response string.
-                            textView.setText("Response is: " + res.substring(0, 500));
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    textView.setText("That didn't work!");
+            listAdapter = new FeedListAdapter(this.getActivity(), feedItems);
+            listView.setAdapter(listAdapter);
+
+            // We first check for cached request
+            Cache cache = AppController.getInstance(applicationContext).getRequestQueue().getCache();
+            Cache.Entry entry = cache.get(URL_FEED);
+            if (entry != null) {
+                // fetch the data from cache
+                try {
+                    String data = new String(entry.data, "UTF-8");
+                    try {
+                        parseJsonFeed(new JSONObject(data));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
                 }
-            });
-// Add the request to the RequestQueue.
-            queue.add(stringRequest);
+
+            } else {
+                // making fresh volley request and getting json
+                JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET,
+                        URL_FEED, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        VolleyLog.d(TAG, "Response: " + response.toString());
+                        if (response != null) {
+                            parseJsonFeed(response);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        VolleyLog.d(TAG, "Error: " + error.getMessage());
+                    }
+                });
+
+                // Adding request to volley request queue
+                AppController.getInstance(applicationContext).addToRequestQueue(jsonReq);
+            }
+
             return rootView;
+        }
+        /**
+         * Parsing json reponse and passing the data to feed view list adapter
+         * */
+        private void parseJsonFeed(JSONObject response) {
+            try {
+                JSONArray feedArray = response.getJSONArray("feed");
+
+                for (int i = 0; i < feedArray.length(); i++) {
+                    JSONObject feedObj = (JSONObject) feedArray.get(i);
+
+                    FeedItem item = new FeedItem();
+                    item.setId(feedObj.getInt("id"));
+                    item.setName(feedObj.getString("name"));
+
+                    // Image might be null sometimes
+                    String image = feedObj.isNull("image") ? null : feedObj
+                            .getString("image");
+                    item.setImge(image);
+                    item.setStatus(feedObj.getString("status"));
+                    item.setProfilePic(feedObj.getString("profilePic"));
+                    item.setTimeStamp(feedObj.getString("timeStamp"));
+
+                    // url might be null sometimes
+                    String feedUrl = feedObj.isNull("url") ? null : feedObj
+                            .getString("url");
+                    item.setUrl(feedUrl);
+
+                    feedItems.add(item);
+                }
+
+                // notify data changes to list adapater
+                listAdapter.notifyDataSetChanged();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override

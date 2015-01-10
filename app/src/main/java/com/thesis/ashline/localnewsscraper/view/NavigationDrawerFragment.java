@@ -1,4 +1,4 @@
-package com.thesis.ashline.localnewsscraper.views;
+package com.thesis.ashline.localnewsscraper.view;
 
 import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;

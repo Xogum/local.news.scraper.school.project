@@ -12,15 +12,15 @@ import com.android.volley.toolbox.Volley;
 /**
  * Created by ashfire on 12/21/14.
  */
-public class Api {
+public class AppController {
 
-    private static Api mInstance;
+    private static AppController mInstance;
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
     private static Context mCtx;
     private static String baseUrl = "http://thesisapi-afromwana.rhcloud.com/";
 
-    private Api(Context context) {
+    private AppController(Context context) {
         mCtx = context;
         mRequestQueue = getRequestQueue();
 
@@ -41,9 +41,9 @@ public class Api {
                 });
     }
 
-    public static synchronized Api getInstance(Context context) {
+    public static synchronized AppController getInstance(Context context) {
         if (mInstance == null) {
-            mInstance = new Api(context);
+            mInstance = new AppController(context);
         }
         return mInstance;
     }
