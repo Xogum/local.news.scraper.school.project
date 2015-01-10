@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".views.ArticleListActivity"
+            android:name=".view.ArticleListActivity"
             android:label="@string/title_activity_article_list"
             android:parentActivityName=".MainActivity" >
             <meta-data

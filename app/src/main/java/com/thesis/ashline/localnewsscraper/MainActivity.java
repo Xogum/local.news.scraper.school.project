@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.thesis.ashline.localnewsscraper.views.ArticleListActivity;
+import com.thesis.ashline.localnewsscraper.view.ArticleListActivity;
 
 
 public class MainActivity extends ActionBarActivity {
