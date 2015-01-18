@@ -112,8 +112,8 @@ public class ArticleListAdapter extends BaseAdapter {
         profilePic.setImageUrl(item.icon_url, imageLoader);
 
         // Feed image
-        if (item.img_url != null) {
-            feedImageView.setImageUrl(item.img_url, imageLoader);
+        if (item.image_url != null) {
+            feedImageView.setImageUrl(item.image_url, imageLoader);
             feedImageView.setVisibility(View.VISIBLE);
             feedImageView
                     .setResponseObserver(new FeedImageView.ResponseObserver() {

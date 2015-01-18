@@ -16,6 +16,6 @@ public class Article {
     public int favourites;
     public String latitude;
     public String longitude;
-    public String img_url;
+    public String image_url;
     public String icon_url;//TODO add to backend
 }
