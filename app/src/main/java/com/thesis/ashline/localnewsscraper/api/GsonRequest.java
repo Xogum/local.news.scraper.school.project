@@ -48,6 +48,35 @@ public class GsonRequest<T> extends Request<T> {
         this.clazz = classType;
         this.listener = listener;
     }
+    /**
+     * Make a  request and return a parsed object from JSON.
+     *
+     *@param method type of request GET,POST ...
+     * @param url URL of the request to make
+     * @param classType Relevant class object, for Gson's reflection
+     * @param headers Map of request headers
+     */
+    public GsonRequest(int method, String url, Class<T> classType, Map<String, String> headers,
+                       Listener<T> listener, ErrorListener errorListener) {
+        super(method, url, errorListener);
+        this.clazz = classType;
+        this.headers = headers;
+        this.listener = listener;
+    }
+    /**
+     * Make request and return a parsed object from JSON.
+     *
+     * @param method type of request GET,POST ...
+     * @param url URL of the request to make
+     * @param classType Relevant class object, for Gson's reflection
+     */
+    public GsonRequest(int method, String url, Class<T> classType,
+                       Listener<T> listener, ErrorListener errorListener) {
+        super(method, url, errorListener);
+        headers = null;
+        this.clazz = classType;
+        this.listener = listener;
+    }
     @Override
     public Map<String, String> getHeaders() throws AuthFailureError {
         return headers != null ? headers : super.getHeaders();

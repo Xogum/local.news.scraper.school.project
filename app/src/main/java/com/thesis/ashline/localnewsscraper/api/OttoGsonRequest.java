@@ -10,8 +10,9 @@ public class OttoGsonRequest<T> extends GsonRequest<T> {
     private static int _idCounter = 1;
     /** A ID for this request, unique for the lifetime of the process (given that you do < 2BN requests) */
     public int requestId;
-    public OttoGsonRequest(Bus eventBus, String url, Class<T> classType) {
-        super(url,
+    public OttoGsonRequest(Bus eventBus,int method, String url, Class<T> classType) {
+        super(method,
+                url,
                 classType,
                 new OttoSuccessListener<T>(eventBus, _idCounter),
                 new OttoErrorListener(eventBus, _idCounter));
