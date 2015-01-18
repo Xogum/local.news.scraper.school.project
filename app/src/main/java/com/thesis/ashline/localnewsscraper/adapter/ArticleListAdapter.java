@@ -87,8 +87,8 @@ public class ArticleListAdapter extends BaseAdapter {
         timestamp.setText(timeAgo);
 
         // Check for empty status message
-        if (!TextUtils.isEmpty(item.text)) {
-            statusMsg.setText(item.text);
+        if (!TextUtils.isEmpty(item.summary)) {
+            statusMsg.setText(item.summary);
             statusMsg.setVisibility(View.VISIBLE);
         } else {
             // status is empty, remove from view

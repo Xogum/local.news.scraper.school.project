@@ -8,7 +8,7 @@ public class Article {
     public String date;
     public String title;
     public String url;
-    public String text; //TODO add to backend
+    public String summary; //TODO add to backend
     public long category_id;
     public int reads;
     public int likes;
