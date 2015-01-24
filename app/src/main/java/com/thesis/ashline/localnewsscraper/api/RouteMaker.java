@@ -30,6 +30,8 @@ public class RouteMaker {
     public static String readsAction = "reads";
     public static String verifyAction = "verify";
 
+    public static String testUrl = "http://api.androidhive.info/feed/feed.json";
+
     /**
      * utility method for extracting fields and valuse from object by reflection
      *
@@ -181,18 +183,15 @@ public class RouteMaker {
                 ActionResponse.class);
     }
     /**
-     * send a DELETE request to "/articles/{aid}/{action}/{uid}"
+     * send a GET request to test url
      * search
      *
-     * @param article
-     * @param user
-     * @param action
      * @return request object
      */
-    public static OttoGsonRequest<ActionResponse> deleteArticleAction(final Article article, final User user, String action ) {
-        return new OttoGsonRequest<ActionResponse>(ServiceLocator.EventBus,
-                Request.Method.DELETE,
-                String.format(articleUserUrl, article.id, action, user.id),
-                ActionResponse.class);
+    public static OttoGsonRequest<TestFeedResponse> getTestFeed() {
+        return new OttoGsonRequest<TestFeedResponse>(ServiceLocator.EventBus,
+                Request.Method.GET,
+                testUrl,
+                TestFeedResponse.class);
     }
 }

@@ -21,7 +21,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.thesis.ashline.localnewsscraper.R;
 import com.thesis.ashline.localnewsscraper.api.AppController;
-import com.thesis.ashline.localnewsscraper.model.FeedItem;
+import com.thesis.ashline.localnewsscraper.model.TestFeedResponse.FeedItem;
 import com.thesis.ashline.localnewsscraper.view.FeedImageView;
 
 public class FeedListAdapter extends BaseAdapter {
@@ -78,17 +78,17 @@ public class FeedListAdapter extends BaseAdapter {
 
         FeedItem item = feedItems.get(position);
 
-        name.setText(item.getName());
+        name.setText(item.name);
 
         // Converting timestamp into x ago format
         CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
-                Long.parseLong(item.getTimeStamp()),
+                Long.parseLong(item.timeStamp),
                 System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
         timestamp.setText(timeAgo);
 
         // Chcek for empty status message
-        if (!TextUtils.isEmpty(item.getStatus())) {
-            statusMsg.setText(item.getStatus());
+        if (!TextUtils.isEmpty(item.status)) {
+            statusMsg.setText(item.status);
             statusMsg.setVisibility(View.VISIBLE);
         } else {
             // status is empty, remove from view
@@ -96,9 +96,9 @@ public class FeedListAdapter extends BaseAdapter {
         }
 
         // Checking for null feed url
-        if (item.getUrl() != null) {
-            url.setText(Html.fromHtml("<a href=\"" + item.getUrl() + "\">"
-                    + item.getUrl() + "</a> "));
+        if (item.url != null && item.url != "" ) {
+            url.setText(Html.fromHtml("<a href=\"" + item.url + "\">"
+                    + item.url + "</a> "));
 
             // Making url clickable
             url.setMovementMethod(LinkMovementMethod.getInstance());
@@ -109,11 +109,11 @@ public class FeedListAdapter extends BaseAdapter {
         }
 
         // user profile pic
-        profilePic.setImageUrl(item.getProfilePic(), imageLoader);
+        profilePic.setImageUrl(item.profilePic, imageLoader);
 
         // Feed image
-        if (item.getImge() != null) {
-            feedImageView.setImageUrl(item.getImge(), imageLoader);
+        if (item.image != null) {
+            feedImageView.setImageUrl(item.image, imageLoader);
             feedImageView.setVisibility(View.VISIBLE);
             feedImageView
                     .setResponseObserver(new FeedImageView.ResponseObserver() {
