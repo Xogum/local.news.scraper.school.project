@@ -7,12 +7,18 @@
     <string name="button_send">Send</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_article_list">ArticleListActivity</string>
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="title_section1">Search</string>
+    <string name="title_section2">Reads</string>
+    <string name="title_section3">Likes</string>
+    <string name="title_section4">Favourites</string>
+    <string name="title_section5">Saves</string>
+    <string name="title_section6">Shares</string>
+    <string name="title_section7">test</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_example">Example action</string>
+    <string name="action_example">refresh</string>
     <string name="action_articles">Articles</string>
+    <string name="title_activity_article">ArticleActivity</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

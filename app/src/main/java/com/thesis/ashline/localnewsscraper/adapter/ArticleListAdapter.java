@@ -1,7 +1,7 @@
 package com.thesis.ashline.localnewsscraper.adapter;
 
 /**
- * Created by ashfire on 12/21/14.
+ * Created by ashfire on 1/17/15.
  */
 
 import java.util.List;
@@ -21,31 +21,31 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.thesis.ashline.localnewsscraper.R;
 import com.thesis.ashline.localnewsscraper.api.AppController;
-import com.thesis.ashline.localnewsscraper.model.TestFeedResponse.FeedItem;
+import com.thesis.ashline.localnewsscraper.model.Article;
 import com.thesis.ashline.localnewsscraper.view.FeedImageView;
 
-public class FeedListAdapter extends BaseAdapter {
+public class ArticleListAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
-    private List<FeedItem> feedItems;
+    private List<Article> articles;
     private Context applicationContext;
     ImageLoader imageLoader;
 
-    public FeedListAdapter(Activity activity, List<FeedItem> feedItems) {
+    public ArticleListAdapter(Activity activity, List<Article> articles) {
         this.activity = activity;
         this.applicationContext = activity.getApplicationContext();
-        this.feedItems = feedItems;
+        this.articles = articles;
         this.imageLoader = AppController.getInstance(this.applicationContext).getImageLoader();
     }
 
     @Override
     public int getCount() {
-        return feedItems.size();
+        return articles.size();
     }
 
     @Override
     public Object getItem(int location) {
-        return feedItems.get(location);
+        return articles.get(location);
     }
 
     @Override
@@ -76,19 +76,19 @@ public class FeedListAdapter extends BaseAdapter {
         FeedImageView feedImageView = (FeedImageView) convertView
                 .findViewById(R.id.feedImage1);
 
-        FeedItem item = feedItems.get(position);
+        Article item = articles.get(position);
 
-        name.setText(item.name);
+        name.setText(item.title);
 
         // Converting timestamp into x ago format
         CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
-                Long.parseLong(item.timeStamp),
+                Long.parseLong(item.date),
                 System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
         timestamp.setText(timeAgo);
 
-        // Chcek for empty status message
-        if (!TextUtils.isEmpty(item.status)) {
-            statusMsg.setText(item.status);
+        // Check for empty status message
+        if (!TextUtils.isEmpty(item.summary)) {
+            statusMsg.setText(item.summary);
             statusMsg.setVisibility(View.VISIBLE);
         } else {
             // status is empty, remove from view
@@ -96,7 +96,7 @@ public class FeedListAdapter extends BaseAdapter {
         }
 
         // Checking for null feed url
-        if (item.url != null && item.url != "" ) {
+        if (item.url != null) {
             url.setText(Html.fromHtml("<a href=\"" + item.url + "\">"
                     + item.url + "</a> "));
 
@@ -109,11 +109,11 @@ public class FeedListAdapter extends BaseAdapter {
         }
 
         // user profile pic
-        profilePic.setImageUrl(item.profilePic, imageLoader);
+        profilePic.setImageUrl(item.icon_url, imageLoader);
 
         // Feed image
-        if (item.image != null) {
-            feedImageView.setImageUrl(item.image, imageLoader);
+        if (item.image_url != null) {
+            feedImageView.setImageUrl(item.image_url, imageLoader);
             feedImageView.setVisibility(View.VISIBLE);
             feedImageView
                     .setResponseObserver(new FeedImageView.ResponseObserver() {
@@ -133,3 +133,4 @@ public class FeedListAdapter extends BaseAdapter {
     }
 
 }
+

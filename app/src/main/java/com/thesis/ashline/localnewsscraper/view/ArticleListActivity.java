@@ -2,11 +2,13 @@ package com.thesis.ashline.localnewsscraper.view;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,25 +18,21 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.volley.Cache;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import com.squareup.otto.Subscribe;
 import com.thesis.ashline.localnewsscraper.R;
 import com.thesis.ashline.localnewsscraper.adapter.FeedListAdapter;
-import com.thesis.ashline.localnewsscraper.api.AppController;
-import com.thesis.ashline.localnewsscraper.model.FeedItem;
+import com.thesis.ashline.localnewsscraper.api.OttoGsonRequest;
+import com.thesis.ashline.localnewsscraper.api.RouteMaker;
+import com.thesis.ashline.localnewsscraper.api.ServiceLocator;
+import com.thesis.ashline.localnewsscraper.api.messages.VolleyRequestSuccess;
+import com.thesis.ashline.localnewsscraper.model.ArticleListActivityViewModel;
+import com.thesis.ashline.localnewsscraper.model.TestFeedResponse;
+import com.thesis.ashline.localnewsscraper.model.TestFeedResponse.FeedItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,11 +49,18 @@ public class ArticleListActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
 
+    private ArticleListActivityViewModel _model;
+    private PlaceholderFragment placeholderFragment;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_list);
-
+//            ----------------------
+        ServiceLocator.ensureInitialized(this);
+        _model = new ArticleListActivityViewModel();
+//            ----------------------
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
@@ -67,11 +72,99 @@ public class ArticleListActivity extends ActionBarActivity
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (_model.listenForResponse) {
+            ServiceLocator.EventBus.register(this);
+            ServiceLocator.ResponseBuffer.stopAndProcess();
+        }
+        //todo maybe if loading show loader
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (_model.listenForResponse) {
+            ServiceLocator.ResponseBuffer.startSaving();
+            ServiceLocator.EventBus.unregister(this);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable("Model", _model);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        _model = (ArticleListActivityViewModel) savedInstanceState.getSerializable("Model");
+    }
+
+    public void onTestSectionSelected(int section) {
+        OttoGsonRequest<TestFeedResponse> request = RouteMaker.getTestFeed();
+        Log.d("OVDR", "Request begin: " + request.requestId);
+        ServiceLocator.VolleyRequestQueue.add(request);
+        updateUiForRequestSent(request);
+    }
+
+    public void onListenForResponseChanged(boolean isChecked) {
+        if (isChecked != _model.listenForResponse) {
+            _model.listenForResponse = isChecked;
+            registerServiceBus(_model.listenForResponse);
+            Log.d("OVDR", "Listen for response: " + _model.listenForResponse);
+        }
+    }
+
+    private void registerServiceBus(boolean register) {
+        if (register) {
+            ServiceLocator.EventBus.register(this);
+            ServiceLocator.ResponseBuffer.stopAndProcess();
+        } else {
+            ServiceLocator.ResponseBuffer.startSaving();
+            ServiceLocator.EventBus.unregister(this);
+        }
+    }
+
+    public void showDetails(final View view) {
+        Intent intent = new Intent(this, ArticleActivity.class);
+        // add url to intent extras
+        TextView urlTextView = (TextView) view.findViewById(R.id.txtUrl);
+        String url = urlTextView.getText().toString();
+        intent.putExtra("article_url", "http://www.bbc.com");
+        startActivity(intent);
+    }
+
+    @Subscribe
+    public void onTestResponseReceived(VolleyRequestSuccess<TestFeedResponse> message) {
+        Log.d("OVDR", "Request end: " + message.requestId);
+        updateUiForResponseReceived(message);
+    }
+
+    private void updateUiForRequestSent(OttoGsonRequest<?> request) {
+        _model.status = "Sent #" + request.requestId;
+        //        bindUi();
+        //todo maybe show loader
+    }
+
+    private void updateUiForResponseReceived(VolleyRequestSuccess<TestFeedResponse> message) {
+        _model.status = "Received #" + message.requestId;
+        _model.prevResult = "#" + message.requestId + " -- " + message.response.feed.size();
+//        bindUi();
+        //todo hide loader
+        //todo render shit
+        //todo if bla bla is 0 render message
+        this.placeholderFragment.renderTestItems(message.response.feed);
+    }
+
+    @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
+        this.placeholderFragment = PlaceholderFragment.newInstance(position + 1);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                .replace(R.id.container, placeholderFragment)
                 .commit();
     }
 
@@ -79,12 +172,32 @@ public class ArticleListActivity extends ActionBarActivity
         switch (number) {
             case 1:
                 mTitle = getString(R.string.title_section1);
+                Log.d("section", "1");
                 break;
             case 2:
                 mTitle = getString(R.string.title_section2);
+                Log.d("section", "2");
                 break;
             case 3:
                 mTitle = getString(R.string.title_section3);
+                Log.d("section", "3");
+                break;
+            case 4:
+                mTitle = getString(R.string.title_section4);
+                Log.d("section", "4");
+                break;
+            case 5:
+                mTitle = getString(R.string.title_section5);
+                Log.d("section", "5");
+                break;
+            case 6:
+                mTitle = getString(R.string.title_section6);
+                Log.d("section", "6");
+                break;
+            case 7:
+                mTitle = getString(R.string.title_section7);
+                Log.d("section", "7");
+                onTestSectionSelected(7);
                 break;
         }
     }
@@ -165,92 +278,18 @@ public class ArticleListActivity extends ActionBarActivity
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+            Log.d("zection", "" + getArguments().getInt(ARG_SECTION_NUMBER));
             View rootView = inflater.inflate(R.layout.fragment_article_list, container, false);
             applicationContext = this.getActivity().getApplicationContext();
-            listView = (ListView)rootView.findViewById(R.id.list);
+
+            listView = (ListView) rootView.findViewById(R.id.list);
 
             feedItems = new ArrayList<FeedItem>();
 
             listAdapter = new FeedListAdapter(this.getActivity(), feedItems);
             listView.setAdapter(listAdapter);
 
-            // We first check for cached request
-            Cache cache = AppController.getInstance(applicationContext).getRequestQueue().getCache();
-            Cache.Entry entry = cache.get(URL_FEED);
-            if (entry != null) {
-                // fetch the data from cache
-                try {
-                    String data = new String(entry.data, "UTF-8");
-                    try {
-                        parseJsonFeed(new JSONObject(data));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-
-            } else {
-                // making fresh volley request and getting json
-                JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET,
-                        URL_FEED, null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        VolleyLog.d(TAG, "Response: " + response.toString());
-                        if (response != null) {
-                            parseJsonFeed(response);
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        VolleyLog.d(TAG, "Error: " + error.getMessage());
-                    }
-                });
-
-                // Adding request to volley request queue
-                AppController.getInstance(applicationContext).addToRequestQueue(jsonReq);
-            }
-
             return rootView;
-        }
-        /**
-         * Parsing json reponse and passing the data to feed view list adapter
-         * */
-        private void parseJsonFeed(JSONObject response) {
-            try {
-                JSONArray feedArray = response.getJSONArray("feed");
-
-                for (int i = 0; i < feedArray.length(); i++) {
-                    JSONObject feedObj = (JSONObject) feedArray.get(i);
-
-                    FeedItem item = new FeedItem();
-                    item.setId(feedObj.getInt("id"));
-                    item.setName(feedObj.getString("name"));
-
-                    // Image might be null sometimes
-                    String image = feedObj.isNull("image") ? null : feedObj
-                            .getString("image");
-                    item.setImge(image);
-                    item.setStatus(feedObj.getString("status"));
-                    item.setProfilePic(feedObj.getString("profilePic"));
-                    item.setTimeStamp(feedObj.getString("timeStamp"));
-
-                    // url might be null sometimes
-                    String feedUrl = feedObj.isNull("url") ? null : feedObj
-                            .getString("url");
-                    item.setUrl(feedUrl);
-
-                    feedItems.add(item);
-                }
-
-                // notify data changes to list adapater
-                listAdapter.notifyDataSetChanged();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
         }
 
         @Override
@@ -259,6 +298,14 @@ public class ArticleListActivity extends ActionBarActivity
             ((ArticleListActivity) activity).onSectionAttached(
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
+
+        public void renderTestItems(ArrayList<FeedItem> feed) {
+            this.feedItems.addAll(feed);
+            // notify data changes to list adapter
+            listAdapter.notifyDataSetChanged();
+        }
+//        todo add response subscriptions etc and test api calls
+        //todo put appropriate content on the nav drawer
     }
 
 }
