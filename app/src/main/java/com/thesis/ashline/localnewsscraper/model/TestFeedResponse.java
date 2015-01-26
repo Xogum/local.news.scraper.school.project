@@ -10,6 +10,7 @@ public class TestFeedResponse {
     public ArrayList<FeedItem> feed;
 
     public class FeedItem {
+        public long id;
         public String name, status, image, profilePic, timeStamp, url;
     }
 }

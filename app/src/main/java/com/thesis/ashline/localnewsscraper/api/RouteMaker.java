@@ -102,14 +102,14 @@ public class RouteMaker {
     /**
      * send a GET request to "/users/{uid}/{action}" to get articles by action for user
      *
-     * @param user
+     * @param userId
      * @param action
      * @return request object
      */
-    public static OttoGsonRequest<Article> gettUserAction(final User user, String action) {
+    public static OttoGsonRequest<Article> gettUserAction(long userId, String action) {
         return new OttoGsonRequest<Article>(ServiceLocator.EventBus,
                 Request.Method.GET,
-                String.format(userActionUrl, user.id, action),
+                String.format(userActionUrl, userId, action),
                 Article.class);
     }
     /**todo likely useless
@@ -169,17 +169,31 @@ public class RouteMaker {
                 ActionResponse.class);
     }
     /**
-     * send a POST request to "/articles/{aid}/{action}"
+     * send a POST request to "/articles/{aid}/{action}/{uid}"
      * search
      *
-     * @param article
+     * @param articleId
      * @param action
      * @return request object
      */
-    public static OttoGsonRequest<ActionResponse> postArticleAction(final Article article, String action ) {
+    public static OttoGsonRequest<ActionResponse> postArticleAction(long articleId, String action, long userId ) {
         return new OttoGsonRequest<ActionResponse>(ServiceLocator.EventBus,
                 Request.Method.POST,
-                String.format(articleActionUrl, article.id, action),
+                String.format(articleUserUrl, articleId, action, userId),
+                ActionResponse.class);
+    }
+    /**
+     * send a DELETE request to "/articles/{aid}/{action}"
+     * search
+     *
+     * @param articleId
+     * @param action
+     * @return request object
+     */
+    public static OttoGsonRequest<ActionResponse> deleteArticleAction(long articleId, String action, long userId ) {
+        return new OttoGsonRequest<ActionResponse>(ServiceLocator.EventBus,
+                Request.Method.DELETE,
+                String.format(articleUserUrl, articleId, action, userId),
                 ActionResponse.class);
     }
     /**

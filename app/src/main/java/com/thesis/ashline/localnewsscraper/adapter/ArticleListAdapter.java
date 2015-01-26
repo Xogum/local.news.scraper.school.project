@@ -71,6 +71,7 @@ public class ArticleListAdapter extends BaseAdapter {
         TextView statusMsg = (TextView) convertView
                 .findViewById(R.id.txtStatusMsg);
         TextView url = (TextView) convertView.findViewById(R.id.txtUrl);
+        TextView id = (TextView) convertView.findViewById(R.id.txtId);
         NetworkImageView profilePic = (NetworkImageView) convertView
                 .findViewById(R.id.profilePic);
         FeedImageView feedImageView = (FeedImageView) convertView
@@ -79,6 +80,8 @@ public class ArticleListAdapter extends BaseAdapter {
         Article item = articles.get(position);
 
         name.setText(item.title);
+
+        id.setText((int) item.id);
 
         // Converting timestamp into x ago format
         CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(

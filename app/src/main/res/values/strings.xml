@@ -20,5 +20,11 @@
     <string name="action_articles">Articles</string>
     <string name="title_activity_article">ArticleActivity</string>
     <string name="hello_world">Hello world!</string>
+    <string name="action_like">like</string>
+    <string name="action_share">share</string>
+    <string name="action_save">save</string>
+    <string name="action_favourite">favourite</string>
+    <string name="added_action">article added to %s</string>
+    <string name="share_with">Share article on</string>
 
 </resources>

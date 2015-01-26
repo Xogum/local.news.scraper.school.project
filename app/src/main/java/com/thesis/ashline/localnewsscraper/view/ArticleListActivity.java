@@ -131,8 +131,11 @@ public class ArticleListActivity extends ActionBarActivity
         Intent intent = new Intent(this, ArticleActivity.class);
         // add url to intent extras
         TextView urlTextView = (TextView) view.findViewById(R.id.txtUrl);
+        TextView idTextView = (TextView) view.findViewById(R.id.txtId);
         String url = urlTextView.getText().toString();
+        String id = idTextView.getText().toString();
         intent.putExtra("article_url", "http://www.bbc.com");
+        intent.putExtra("article_id", id);
         startActivity(intent);
     }
 
