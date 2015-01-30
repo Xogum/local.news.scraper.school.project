@@ -106,11 +106,11 @@ public class RouteMaker {
      * @param action
      * @return request object
      */
-    public static OttoGsonRequest<Article> gettUserAction(long userId, String action) {
-        return new OttoGsonRequest<Article>(ServiceLocator.EventBus,
+    public static OttoGsonRequest<ArticleListResponse> getUserAction(long userId, String action) {
+        return new OttoGsonRequest<ArticleListResponse>(ServiceLocator.EventBus,
                 Request.Method.GET,
                 String.format(userActionUrl, userId, action),
-                Article.class);
+                ArticleListResponse.class);
     }
     /**todo likely useless
      * send a GET request to "/users/{id}" to get user info
@@ -144,11 +144,11 @@ public class RouteMaker {
      * @param search
      * @return request object
      */
-    public static OttoGsonRequest<Article> getArticles(final Search search) {
-        return new OttoGsonRequest<Article>(ServiceLocator.EventBus,
+    public static OttoGsonRequest<ArticleListResponse> getArticles(final Search search) {
+        return new OttoGsonRequest<ArticleListResponse>(ServiceLocator.EventBus,
                 Request.Method.GET,
                 articlesUrl,
-                Article.class) {
+                ArticleListResponse.class) {
             @Override
             protected Map<String, String> getParams() {
                 return makeParameterMap(search);

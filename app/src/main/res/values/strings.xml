@@ -26,5 +26,7 @@
     <string name="action_favourite">favourite</string>
     <string name="added_action">article added to %s</string>
     <string name="share_with">Share article on</string>
+    <string name="empty_list">No results found</string>
+    <string name="title_activity_registration">Registration</string>
 
 </resources>

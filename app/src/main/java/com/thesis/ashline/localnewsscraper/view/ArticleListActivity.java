@@ -20,18 +20,18 @@ import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 import com.thesis.ashline.localnewsscraper.R;
+import com.thesis.ashline.localnewsscraper.adapter.ArticleListAdapter;
 import com.thesis.ashline.localnewsscraper.adapter.FeedListAdapter;
 import com.thesis.ashline.localnewsscraper.api.OttoGsonRequest;
 import com.thesis.ashline.localnewsscraper.api.RouteMaker;
 import com.thesis.ashline.localnewsscraper.api.ServiceLocator;
 import com.thesis.ashline.localnewsscraper.api.messages.VolleyRequestSuccess;
+import com.thesis.ashline.localnewsscraper.model.Article;
 import com.thesis.ashline.localnewsscraper.model.ArticleListActivityViewModel;
+import com.thesis.ashline.localnewsscraper.model.ArticleListResponse;
+import com.thesis.ashline.localnewsscraper.model.Search;
 import com.thesis.ashline.localnewsscraper.model.TestFeedResponse;
 import com.thesis.ashline.localnewsscraper.model.TestFeedResponse.FeedItem;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +51,15 @@ public class ArticleListActivity extends ActionBarActivity
 
     private ArticleListActivityViewModel _model;
     private PlaceholderFragment placeholderFragment;
+    private int userId, articleId;
+    private final int SEARCH = 1;
+    private final int READS = 2;
+    private final int LIKES = 3;
+    private final int FAVOURITES = 4;
+    private final int SAVES = 5;
+    private final int SHARES = 6;
+    private final int TEST = 7;
+    private final String[] actions = {"", "", "reads", "likes", "favourites", "saves", "shares"};
 
 
     @Override
@@ -69,6 +78,7 @@ public class ArticleListActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+        //todo get userid
     }
 
     @Override
@@ -102,13 +112,6 @@ public class ArticleListActivity extends ActionBarActivity
         _model = (ArticleListActivityViewModel) savedInstanceState.getSerializable("Model");
     }
 
-    public void onTestSectionSelected(int section) {
-        OttoGsonRequest<TestFeedResponse> request = RouteMaker.getTestFeed();
-        Log.d("OVDR", "Request begin: " + request.requestId);
-        ServiceLocator.VolleyRequestQueue.add(request);
-        updateUiForRequestSent(request);
-    }
-
     public void onListenForResponseChanged(boolean isChecked) {
         if (isChecked != _model.listenForResponse) {
             _model.listenForResponse = isChecked;
@@ -139,10 +142,16 @@ public class ArticleListActivity extends ActionBarActivity
         startActivity(intent);
     }
 
+
     @Subscribe
-    public void onTestResponseReceived(VolleyRequestSuccess<TestFeedResponse> message) {
+    public void onArticleResponseReceived(VolleyRequestSuccess<ArticleListResponse> message) {
         Log.d("OVDR", "Request end: " + message.requestId);
-        updateUiForResponseReceived(message);
+        updateUiForArticleResponseReceived(message);
+    }
+    @Subscribe
+     public void onTestResponseReceived(VolleyRequestSuccess<TestFeedResponse> message) {
+        Log.d("OVDR", "Request end: " + message.requestId);
+        updateUiForTestResponseReceived(message);
     }
 
     private void updateUiForRequestSent(OttoGsonRequest<?> request) {
@@ -151,7 +160,7 @@ public class ArticleListActivity extends ActionBarActivity
         //todo maybe show loader
     }
 
-    private void updateUiForResponseReceived(VolleyRequestSuccess<TestFeedResponse> message) {
+    private void updateUiForTestResponseReceived(VolleyRequestSuccess<TestFeedResponse> message) {
         _model.status = "Received #" + message.requestId;
         _model.prevResult = "#" + message.requestId + " -- " + message.response.feed.size();
 //        bindUi();
@@ -159,6 +168,15 @@ public class ArticleListActivity extends ActionBarActivity
         //todo render shit
         //todo if bla bla is 0 render message
         this.placeholderFragment.renderTestItems(message.response.feed);
+    }
+    private void updateUiForArticleResponseReceived(VolleyRequestSuccess<ArticleListResponse> message) {
+        _model.status = "Received #" + message.requestId;
+        _model.prevResult = "#" + message.requestId + " -- " + message.response.articles.size();
+//        bindUi();
+        //todo hide loader
+        //todo render shit
+        //todo if bla bla is 0 render message
+        this.placeholderFragment.renderArticles(message.response.articles);
     }
 
     @Override
@@ -172,35 +190,67 @@ public class ArticleListActivity extends ActionBarActivity
     }
 
     public void onSectionAttached(int number) {
+        OttoGsonRequest<TestFeedResponse> testRequest;
+        OttoGsonRequest<ArticleListResponse> articleRequest;
         switch (number) {
-            case 1:
+            case SEARCH:
                 mTitle = getString(R.string.title_section1);
-                Log.d("section", "1");
+//                onActionSelected(SEARCH);
+                Search search = new Search();
+                //todo fill search
+                //add userid to search, for logging
+                articleRequest = RouteMaker.getArticles(search);
+                Log.d("OVDR", "Request begin: " + articleRequest.requestId);
+                ServiceLocator.VolleyRequestQueue.add(articleRequest);
+                updateUiForRequestSent(articleRequest);
                 break;
-            case 2:
+            case READS:
                 mTitle = getString(R.string.title_section2);
-                Log.d("section", "2");
+//                onActionSelected(READS);
+                articleRequest = RouteMaker.getUserAction(userId, actions[READS]);
+                Log.d("OVDR", "Request begin: " + articleRequest.requestId);
+                ServiceLocator.VolleyRequestQueue.add(articleRequest);
+                updateUiForRequestSent(articleRequest);
                 break;
-            case 3:
+            case LIKES:
                 mTitle = getString(R.string.title_section3);
-                Log.d("section", "3");
+//                onActionSelected(LIKES);
+                articleRequest = RouteMaker.getUserAction(userId, actions[LIKES]);
+                Log.d("OVDR", "Request begin: " + articleRequest.requestId);
+                ServiceLocator.VolleyRequestQueue.add(articleRequest);
+                updateUiForRequestSent(articleRequest);
                 break;
-            case 4:
+            case FAVOURITES:
                 mTitle = getString(R.string.title_section4);
-                Log.d("section", "4");
+//                onActionSelected(FAVOURITES);
+                articleRequest = RouteMaker.getUserAction(userId, actions[FAVOURITES]);
+                Log.d("OVDR", "Request begin: " + articleRequest.requestId);
+                ServiceLocator.VolleyRequestQueue.add(articleRequest);
+                updateUiForRequestSent(articleRequest);
                 break;
-            case 5:
+            case SAVES:
                 mTitle = getString(R.string.title_section5);
-                Log.d("section", "5");
+//                onActionSelected(SAVES);
+                articleRequest = RouteMaker.getUserAction(userId, actions[SAVES]);
+                Log.d("OVDR", "Request begin: " + articleRequest.requestId);
+                ServiceLocator.VolleyRequestQueue.add(articleRequest);
+                updateUiForRequestSent(articleRequest);
                 break;
-            case 6:
+            case SHARES:
                 mTitle = getString(R.string.title_section6);
-                Log.d("section", "6");
+//                onActionSelected(SHARES);
+                articleRequest = RouteMaker.getUserAction(userId, actions[SHARES]);
+                Log.d("OVDR", "Request begin: " + articleRequest.requestId);
+                ServiceLocator.VolleyRequestQueue.add(articleRequest);
+                updateUiForRequestSent(articleRequest);
                 break;
             case 7:
                 mTitle = getString(R.string.title_section7);
-                Log.d("section", "7");
-                onTestSectionSelected(7);
+//                onActionSelected(TEST);
+                testRequest = RouteMaker.getTestFeed();
+                Log.d("OVDR", "Request begin: " + testRequest.requestId);
+                ServiceLocator.VolleyRequestQueue.add(testRequest);
+                updateUiForRequestSent(testRequest);
                 break;
         }
     }
@@ -255,11 +305,13 @@ public class ArticleListActivity extends ActionBarActivity
          */
         private TextView textView;
         private ListView listView;
-        private FeedListAdapter listAdapter;
+        private ArticleListAdapter articleListAdapter;
+        private FeedListAdapter feedListAdapter;
         private List<FeedItem> feedItems;
         private String URL_FEED = "http://api.androidhive.info/feed/feed.json";
         private Context applicationContext;
         private static final String TAG = ArticleListActivity.class.getSimpleName();
+        private List<Article> articleList;
 
 
         /**
@@ -286,11 +338,12 @@ public class ArticleListActivity extends ActionBarActivity
             applicationContext = this.getActivity().getApplicationContext();
 
             listView = (ListView) rootView.findViewById(R.id.list);
-
+            listView.setEmptyView(rootView.findViewById(R.id.emptyElement));
             feedItems = new ArrayList<FeedItem>();
+            articleList = new ArrayList<Article>();
 
-            listAdapter = new FeedListAdapter(this.getActivity(), feedItems);
-            listView.setAdapter(listAdapter);
+            feedListAdapter = new FeedListAdapter(this.getActivity(), feedItems);
+            articleListAdapter = new ArticleListAdapter(this.getActivity(), articleList);
 
             return rootView;
         }
@@ -303,9 +356,19 @@ public class ArticleListActivity extends ActionBarActivity
         }
 
         public void renderTestItems(ArrayList<FeedItem> feed) {
+            listView.setAdapter(feedListAdapter);
             this.feedItems.addAll(feed);
             // notify data changes to list adapter
-            listAdapter.notifyDataSetChanged();
+            feedListAdapter.notifyDataSetChanged();
+        }
+
+        public void renderArticles(ArrayList<Article> articles) {
+            //todo handle different responses, shares/likes etc
+            listView.setAdapter(articleListAdapter);
+            this.articleList.addAll(articles);
+            // notify data changes to list adapter
+            articleListAdapter.notifyDataSetChanged();
+
         }
 //        todo add response subscriptions etc and test api calls
         //todo put appropriate content on the nav drawer

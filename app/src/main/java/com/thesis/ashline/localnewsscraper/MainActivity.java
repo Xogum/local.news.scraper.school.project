@@ -7,6 +7,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.thesis.ashline.localnewsscraper.view.ArticleListActivity;
+import com.thesis.ashline.localnewsscraper.view.RegistrationActivity;
+import com.thesis.ashline.localnewsscraper.view.SettingsActivity;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -15,6 +17,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        openRegistration();
     }
 
 
@@ -32,6 +35,7 @@ public class MainActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         switch(item.getItemId()){
             case R.id.action_settings:
+                openSettings();
                 return true;
             case R.id.action_activity_list:
                 openArticleList();
@@ -43,6 +47,16 @@ public class MainActivity extends ActionBarActivity {
 
     private void openArticleList() {
         Intent intent = new Intent(this, ArticleListActivity.class);
+
+        startActivity(intent);
+    }
+    private void openSettings() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+
+        startActivity(intent);
+    }
+    private void openRegistration() {
+        Intent intent = new Intent(this, RegistrationActivity.class);
 
         startActivity(intent);
     }
