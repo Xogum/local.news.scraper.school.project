@@ -3,6 +3,8 @@
     package="com.thesis.ashline.localnewsscraper" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
 
     <application
         android:allowBackup="true"
@@ -42,6 +44,12 @@
         <activity
             android:name=".view.RegistrationActivity"
             android:label="@string/title_activity_registration" >
+        </activity>
+        <activity
+            android:name=".view.LoadingActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_loading"
+            android:theme="@style/FullscreenTheme" >
         </activity>
     </application>
 
