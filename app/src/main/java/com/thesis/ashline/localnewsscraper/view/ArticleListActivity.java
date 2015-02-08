@@ -3,6 +3,7 @@ package com.thesis.ashline.localnewsscraper.view;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
 import com.thesis.ashline.localnewsscraper.R;
@@ -25,9 +27,10 @@ import com.thesis.ashline.localnewsscraper.adapter.FeedListAdapter;
 import com.thesis.ashline.localnewsscraper.api.OttoGsonRequest;
 import com.thesis.ashline.localnewsscraper.api.RouteMaker;
 import com.thesis.ashline.localnewsscraper.api.ServiceLocator;
+import com.thesis.ashline.localnewsscraper.api.messages.VolleyRequestFailed;
 import com.thesis.ashline.localnewsscraper.api.messages.VolleyRequestSuccess;
+import com.thesis.ashline.localnewsscraper.model.ActivityViewModel;
 import com.thesis.ashline.localnewsscraper.model.Article;
-import com.thesis.ashline.localnewsscraper.model.ArticleListActivityViewModel;
 import com.thesis.ashline.localnewsscraper.model.ArticleListResponse;
 import com.thesis.ashline.localnewsscraper.model.Search;
 import com.thesis.ashline.localnewsscraper.model.TestFeedResponse;
@@ -49,9 +52,9 @@ public class ArticleListActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
 
-    private ArticleListActivityViewModel _model;
+    private ActivityViewModel _model;
     private PlaceholderFragment placeholderFragment;
-    private int userId, articleId;
+    private long userId, articleId;
     private final int SEARCH = 1;
     private final int READS = 2;
     private final int LIKES = 3;
@@ -68,7 +71,7 @@ public class ArticleListActivity extends ActionBarActivity
         setContentView(R.layout.activity_article_list);
 //            ----------------------
         ServiceLocator.ensureInitialized(this);
-        _model = new ArticleListActivityViewModel();
+        _model = new ActivityViewModel();
 //            ----------------------
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -78,7 +81,13 @@ public class ArticleListActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
-        //todo get userid
+
+        SharedPreferences settings = getSharedPreferences(LoadingActivity.USER_DATA, Context.MODE_PRIVATE);
+        userId = settings.getLong("user_id", 0);
+        if (userId == 0) {
+            Intent intent = new Intent(this, RegistrationActivity.class);
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -109,7 +118,7 @@ public class ArticleListActivity extends ActionBarActivity
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        _model = (ArticleListActivityViewModel) savedInstanceState.getSerializable("Model");
+        _model = (ActivityViewModel) savedInstanceState.getSerializable("Model");
     }
 
     public void onListenForResponseChanged(boolean isChecked) {
@@ -148,10 +157,16 @@ public class ArticleListActivity extends ActionBarActivity
         Log.d("OVDR", "Request end: " + message.requestId);
         updateUiForArticleResponseReceived(message);
     }
+
     @Subscribe
-     public void onTestResponseReceived(VolleyRequestSuccess<TestFeedResponse> message) {
+    public void onTestResponseReceived(VolleyRequestSuccess<TestFeedResponse> message) {
         Log.d("OVDR", "Request end: " + message.requestId);
         updateUiForTestResponseReceived(message);
+    }
+
+    @Subscribe
+    public void onResponseError(VolleyRequestFailed what) {
+        //todo test this
     }
 
     private void updateUiForRequestSent(OttoGsonRequest<?> request) {
@@ -166,16 +181,15 @@ public class ArticleListActivity extends ActionBarActivity
 //        bindUi();
         //todo hide loader
         //todo render shit
-        //todo if bla bla is 0 render message
         this.placeholderFragment.renderTestItems(message.response.feed);
     }
+
     private void updateUiForArticleResponseReceived(VolleyRequestSuccess<ArticleListResponse> message) {
         _model.status = "Received #" + message.requestId;
         _model.prevResult = "#" + message.requestId + " -- " + message.response.articles.size();
 //        bindUi();
         //todo hide loader
         //todo render shit
-        //todo if bla bla is 0 render message
         this.placeholderFragment.renderArticles(message.response.articles);
     }
 
@@ -284,8 +298,16 @@ public class ArticleListActivity extends ActionBarActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_settings:
+                return true;
+            case R.id.action_example:
+                SharedPreferences preferences = getSharedPreferences(LoadingActivity.USER_DATA, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.clear();
+                editor.commit();
+                Toast.makeText(this, "user prefs cleared", Toast.LENGTH_SHORT).show();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);

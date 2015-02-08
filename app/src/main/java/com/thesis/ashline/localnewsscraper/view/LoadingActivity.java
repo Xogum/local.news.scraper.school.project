@@ -1,5 +1,14 @@
 package com.thesis.ashline.localnewsscraper.view;
 
+import com.squareup.otto.Subscribe;
+import com.thesis.ashline.localnewsscraper.api.OttoGsonRequest;
+import com.thesis.ashline.localnewsscraper.api.RouteMaker;
+import com.thesis.ashline.localnewsscraper.api.ServiceLocator;
+import com.thesis.ashline.localnewsscraper.api.messages.VolleyRequestFailed;
+import com.thesis.ashline.localnewsscraper.api.messages.VolleyRequestSuccess;
+import com.thesis.ashline.localnewsscraper.model.ActivityViewModel;
+import com.thesis.ashline.localnewsscraper.model.User;
+import com.thesis.ashline.localnewsscraper.model.UserResponse;
 import com.thesis.ashline.localnewsscraper.view.util.SystemUiHider;
 
 import android.annotation.TargetApi;
@@ -8,12 +17,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -28,7 +39,10 @@ import com.thesis.ashline.localnewsscraper.R;
  */
 public class LoadingActivity extends Activity {
     private BroadcastReceiver receiver;
+    public static final String USER_DATA = "user_data";
     public static final int REGISTER_MODE = 1;
+    private ActivityViewModel _model;
+
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -63,6 +77,10 @@ public class LoadingActivity extends Activity {
 
         setContentView(R.layout.activity_loading);
         setTitle(getResources().getString(R.string.loading));
+
+        ServiceLocator.ensureInitialized(this);
+        _model = new ActivityViewModel();
+
         final View controlsView = findViewById(R.id.fullscreen_content_controls);
         final View contentView = findViewById(R.id.fullscreen_content);
 
@@ -131,6 +149,7 @@ public class LoadingActivity extends Activity {
             switch (mode) {
                 case REGISTER_MODE:
                     final String phonenumber = b.getString("phone");
+                    final String username = b.getString("username");
                     IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
                     receiver = new BroadcastReceiver() {
 
@@ -144,12 +163,13 @@ public class LoadingActivity extends Activity {
                             Object[] pdus = (Object[]) extras.get("pdus");
                             SmsMessage msg = SmsMessage.createFromPdu((byte[]) pdus[0]);
                             String origNumber = msg.getOriginatingAddress();
-                            String msgBody = msg.getMessageBody();
+//                            String msgBody = msg.getMessageBody();
 //                checkIf sms came from app
-                            if(PhoneNumberUtils.compare(phonenumber, origNumber))
-                            {
+                            if (PhoneNumberUtils.compare(phonenumber, origNumber)) {
                                 Toast.makeText(getApplicationContext(), "Are same", Toast.LENGTH_LONG).show();
                                 //send user registration call
+                                postUserRegistration(username, phonenumber);
+
                                 //store user id in preferences
                                 //proceed to article list
                             }
@@ -161,6 +181,51 @@ public class LoadingActivity extends Activity {
 
             }
         }
+    }
+
+    private void postUserRegistration(String username, String phonenumber) {
+        OttoGsonRequest<UserResponse> userRequest;
+        User user = new User();
+        user.username = username;
+        user.phone_number = phonenumber;
+        userRequest = RouteMaker.postUser(user);
+        ServiceLocator.VolleyRequestQueue.add(userRequest);
+    }
+
+    @Subscribe
+    public void onUserResponseReceived(VolleyRequestSuccess<UserResponse> message) {
+        Log.d("OVDR", "Request end: " + message.requestId);
+        saveUserToPreferences(message.response.user);
+        openArticleList();
+//        updateUiForTestResponseReceived(message);
+
+    }
+
+    @Subscribe
+    public void onResponseError(VolleyRequestFailed message) {
+        //todo test this
+        VolleyRequestFailed f = message;
+        Toast.makeText(this, "Network request Error", Toast.LENGTH_SHORT).show();
+        openRegistration();
+    }
+
+    private void openArticleList() {
+        Intent intent = new Intent(this, ArticleListActivity.class);
+        startActivity(intent);
+    }
+
+    private void openRegistration() {
+        Intent intent = new Intent(this, RegistrationActivity.class);
+        startActivity(intent);
+    }
+
+    private void saveUserToPreferences(User user) {
+        SharedPreferences settings = getSharedPreferences(USER_DATA, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putLong("user_id", user.id);
+        editor.putString("user_username", user.username);
+        editor.putString("user_phonenumber", user.phone_number);
+        editor.commit();
     }
 
     @Override
@@ -216,9 +281,57 @@ public class LoadingActivity extends Activity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (_model.listenForResponse) {
+            ServiceLocator.EventBus.register(this);
+            ServiceLocator.ResponseBuffer.stopAndProcess();
+        }
+        //todo maybe if loading show loader
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (_model.listenForResponse) {
+            ServiceLocator.ResponseBuffer.startSaving();
+            ServiceLocator.EventBus.unregister(this);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable("Model", _model);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        _model = (ActivityViewModel) savedInstanceState.getSerializable("Model");
+    }
+
+    private void registerServiceBus(boolean register) {
+        if (register) {
+            ServiceLocator.EventBus.register(this);
+            ServiceLocator.ResponseBuffer.stopAndProcess();
+        } else {
+            ServiceLocator.ResponseBuffer.startSaving();
+            ServiceLocator.EventBus.unregister(this);
+        }
+    }
+
     private void sendSms(String number) {
         String msg = getResources().getString(R.string.verificationMessage);
         SmsManager sm = SmsManager.getDefault();
-        sm.sendTextMessage(number, null, msg, null, null);
+        try {
+            sm.sendTextMessage(number, null, msg, null, null);
+        } catch (Exception e) {
+            Toast.makeText(this, "Your sms has failed...",
+                    	                    Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+            openRegistration();
+        }
     }
 }

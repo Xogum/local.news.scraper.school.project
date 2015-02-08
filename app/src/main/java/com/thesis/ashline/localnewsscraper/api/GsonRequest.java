@@ -1,5 +1,6 @@
 package com.thesis.ashline.localnewsscraper.api;
 
+import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.android.volley.AuthFailureError;
@@ -87,6 +88,11 @@ public class GsonRequest<T> extends Request<T> {
     }
     @Override
     protected Response<T> parseNetworkResponse(NetworkResponse response) {
+        //todo check response.statusCode
+        if (response.statusCode != 200){
+            VolleyError error = new VolleyError(response);
+            return Response.error(error);
+        }
         try {
             String json = new String(
                     response.data, HttpHeaderParser.parseCharset(response.headers));

@@ -45,6 +45,8 @@ public class RouteMaker {
             try {
                 params.put(field.getName(), field.get(object).toString());
             } catch (IllegalAccessException e) {
+            }catch (NullPointerException e){
+                params.put(field.getName(), "");
             }
         }
         return params;
@@ -56,8 +58,8 @@ public class RouteMaker {
      * @param user
      * @return request object
      */
-    public static OttoGsonRequest<User> postUser(final User user) {
-        return new OttoGsonRequest<User>(ServiceLocator.EventBus, Request.Method.POST, usersUrl, User.class) {
+    public static OttoGsonRequest<UserResponse> postUser(final User user) {
+        return new OttoGsonRequest<UserResponse>(ServiceLocator.EventBus, Request.Method.POST, usersUrl, UserResponse.class) {
             @Override
             protected Map<String, String> getParams() {
                 return makeParameterMap(user);
