@@ -151,22 +151,36 @@ public class ArticleListActivity extends ActionBarActivity
         startActivity(intent);
     }
 
-
     @Subscribe
-    public void onArticleResponseReceived(VolleyRequestSuccess<ArticleListResponse> message) {
+    public void onResponseReceived(VolleyRequestSuccess<?> message) {
+        _model.status = "Received #" + message.requestId;
+        _model.prevResult = "#" + message.requestId + " -- ";
+       if (message.response instanceof ArticleListResponse){
+            ArticleListResponse response = (ArticleListResponse) message.response;
+           updateUiResponseReceived(response);
+       }
+        else if(message.response instanceof TestFeedResponse){
+           TestFeedResponse response = (TestFeedResponse) message.response;
+           updateUiResponseReceived(response);
+       }
         Log.d("OVDR", "Request end: " + message.requestId);
-        updateUiForArticleResponseReceived(message);
+    }
+
+    private void updateUiResponseReceived(TestFeedResponse response) {
+        //todo hide loader
+        //todo render shit
+        this.placeholderFragment.renderTestItems(response.feed);
+    }
+    private void updateUiResponseReceived(ArticleListResponse response) {
+        //todo hide loader
+        //todo render shit
+        this.placeholderFragment.renderArticles(response.articles);
     }
 
     @Subscribe
-    public void onTestResponseReceived(VolleyRequestSuccess<TestFeedResponse> message) {
-        Log.d("OVDR", "Request end: " + message.requestId);
-        updateUiForTestResponseReceived(message);
-    }
-
-    @Subscribe
-    public void onResponseError(VolleyRequestFailed what) {
+    public void onResponseError(VolleyRequestFailed message) {
         //todo test this
+        Toast.makeText(this, "Network request Error", Toast.LENGTH_SHORT).show();
     }
 
     private void updateUiForRequestSent(OttoGsonRequest<?> request) {
@@ -176,8 +190,8 @@ public class ArticleListActivity extends ActionBarActivity
     }
 
     private void updateUiForTestResponseReceived(VolleyRequestSuccess<TestFeedResponse> message) {
-        _model.status = "Received #" + message.requestId;
-        _model.prevResult = "#" + message.requestId + " -- " + message.response.feed.size();
+//        _model.status = "Received #" + message.requestId;
+//        _model.prevResult = "#" + message.requestId + " -- " + message.response.feed.size();
 //        bindUi();
         //todo hide loader
         //todo render shit
@@ -185,8 +199,8 @@ public class ArticleListActivity extends ActionBarActivity
     }
 
     private void updateUiForArticleResponseReceived(VolleyRequestSuccess<ArticleListResponse> message) {
-        _model.status = "Received #" + message.requestId;
-        _model.prevResult = "#" + message.requestId + " -- " + message.response.articles.size();
+//        _model.status = "Received #" + message.requestId;
+//        _model.prevResult = "#" + message.requestId + " -- " + message.response.articles.size();
 //        bindUi();
         //todo hide loader
         //todo render shit
@@ -258,7 +272,7 @@ public class ArticleListActivity extends ActionBarActivity
                 ServiceLocator.VolleyRequestQueue.add(articleRequest);
                 updateUiForRequestSent(articleRequest);
                 break;
-            case 7:
+            case TEST:
                 mTitle = getString(R.string.title_section7);
 //                onActionSelected(TEST);
                 testRequest = RouteMaker.getTestFeed();
@@ -300,6 +314,7 @@ public class ArticleListActivity extends ActionBarActivity
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_settings:
+                openSettings();
                 return true;
             case R.id.action_example:
                 SharedPreferences preferences = getSharedPreferences(LoadingActivity.USER_DATA, Context.MODE_PRIVATE);
@@ -311,6 +326,11 @@ public class ArticleListActivity extends ActionBarActivity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void openSettings() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     /**

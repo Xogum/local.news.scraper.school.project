@@ -49,7 +49,6 @@ public class MainActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.action_settings:
-                openSettings();
                 return true;
             case R.id.action_activity_list:
                 openArticleList();
@@ -61,19 +60,15 @@ public class MainActivity extends ActionBarActivity {
 
     private void openArticleList() {
         Intent intent = new Intent(this, ArticleListActivity.class);
-
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-    }
-
-    private void openSettings() {
-        Intent intent = new Intent(this, SettingsActivity.class);
-
-        startActivity(intent);
+        finish();
     }
 
     private void openRegistration() {
         Intent intent = new Intent(this, RegistrationActivity.class);
-
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+        finish();
     }
 }

@@ -14,4 +14,8 @@
         android:fragment="com.thesis.ashline.localnewsscraper.view.SettingsActivity$DataSyncPreferenceFragment"
         android:title="@string/pref_header_data_sync" />
 
+    <header
+        android:fragment="com.thesis.ashline.localnewsscraper.view.SettingsActivity$PageSizePreferenceFragment"
+        android:title="@string/pref_header_page_size" />
+
 </preference-headers>

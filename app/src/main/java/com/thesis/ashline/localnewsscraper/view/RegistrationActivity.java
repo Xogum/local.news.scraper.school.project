@@ -91,7 +91,9 @@ public class RegistrationActivity extends ActionBarActivity {
                     intent.putExtra("phone", countryCode + phonenumber);
                     intent.putExtra("mode", LoadingActivity.REGISTER_MODE
                     );
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
+                    finish();
                 }
             }
         });

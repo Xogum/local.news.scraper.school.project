@@ -46,6 +46,19 @@
         <item>360</item>
         <item>-1</item>
     </string-array>
+    <!-- page size settings-->
+    <string name="pref_header_page_size">Search results</string>
+    <string name="pref_title_search_page_size">Number of results to show</string>
+    <string-array name="pref_search_page_size_titles">
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+    </string-array>
+    <string-array name="pref_search_page_size_values">
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+    </string-array>
 
     <string name="pref_title_system_sync_settings">System sync settings</string>
 

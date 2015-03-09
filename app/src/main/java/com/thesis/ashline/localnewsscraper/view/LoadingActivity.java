@@ -1,5 +1,11 @@
 package com.thesis.ashline.localnewsscraper.view;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
+import com.android.volley.Response;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.squareup.otto.Subscribe;
 import com.thesis.ashline.localnewsscraper.api.OttoGsonRequest;
 import com.thesis.ashline.localnewsscraper.api.RouteMaker;
@@ -30,6 +36,11 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.thesis.ashline.localnewsscraper.R;
+
+import org.apache.http.protocol.HTTP;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -203,20 +214,44 @@ public class LoadingActivity extends Activity {
 
     @Subscribe
     public void onResponseError(VolleyRequestFailed message) {
-        //todo test this
-        VolleyRequestFailed f = message;
+        try {
+            NetworkResponse networkResponse = message.error.networkResponse;
+            if (networkResponse.statusCode == 403 && networkResponse.data != null) {
+                UserResponse userResponse = parseResponse(networkResponse);
+                saveUserToPreferences(userResponse.user);
+                openArticleList();
+                return;
+            }
+        } catch (NullPointerException e) {
+        }
         Toast.makeText(this, "Network request Error", Toast.LENGTH_SHORT).show();
         openRegistration();
     }
 
+    private UserResponse parseResponse(NetworkResponse response) {
+        Gson gson = new Gson();
+        try {
+            String json = new String(
+                    response.data, HttpHeaderParser.parseCharset(response.headers));
+            return gson.fromJson(json, UserResponse.class);
+        } catch (UnsupportedEncodingException e) {
+        } catch (JsonSyntaxException e) {
+        }
+        return null;
+    }
+
     private void openArticleList() {
         Intent intent = new Intent(this, ArticleListActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+        finish();
     }
 
     private void openRegistration() {
         Intent intent = new Intent(this, RegistrationActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+        finish();
     }
 
     private void saveUserToPreferences(User user) {
@@ -329,7 +364,7 @@ public class LoadingActivity extends Activity {
             sm.sendTextMessage(number, null, msg, null, null);
         } catch (Exception e) {
             Toast.makeText(this, "Your sms has failed...",
-                    	                    Toast.LENGTH_LONG).show();
+                    Toast.LENGTH_LONG).show();
             e.printStackTrace();
             openRegistration();
         }
