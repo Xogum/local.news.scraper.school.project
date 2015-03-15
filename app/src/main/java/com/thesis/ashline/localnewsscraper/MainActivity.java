@@ -12,6 +12,7 @@ import com.thesis.ashline.localnewsscraper.view.ArticleListActivity;
 import com.thesis.ashline.localnewsscraper.view.LoadingActivity;
 import com.thesis.ashline.localnewsscraper.view.RegistrationActivity;
 import com.thesis.ashline.localnewsscraper.view.SettingsActivity;
+import com.thesis.ashline.localnewsscraper.view.TestDBActivity;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -20,11 +21,12 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (userExists()) {
-            openArticleList();
-        } else {
-            openRegistration();
-        }
+        testDB();
+//        if (userExists()) {
+//            openArticleList();
+//        } else {
+//            openRegistration();
+//        }
     }
 
     private boolean userExists() {
@@ -61,6 +63,12 @@ public class MainActivity extends ActionBarActivity {
     private void openArticleList() {
         Intent intent = new Intent(this, ArticleListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    private void testDB() {
+        Intent intent = new Intent(this, TestDBActivity.class);
         startActivity(intent);
         finish();
     }

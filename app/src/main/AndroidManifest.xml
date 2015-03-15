@@ -51,6 +51,10 @@
             android:label="@string/title_activity_loading"
             android:theme="@style/FullscreenTheme" >
         </activity>
+        <activity
+            android:name=".view.TestDBActivity"
+            android:label="@string/title_activity_test_db" >
+        </activity>
     </application>
 
 </manifest>
