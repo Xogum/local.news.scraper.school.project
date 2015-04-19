@@ -21,6 +21,7 @@ import android.widget.TextView.OnEditorActionListener;
 
 import com.thesis.ashline.localnewsscraper.R;
 import com.thesis.ashline.localnewsscraper.adapter.CountrySpinnerAdapter;
+import com.thesis.ashline.localnewsscraper.database.DB;
 import com.thesis.ashline.localnewsscraper.model.Country;
 
 import org.json.JSONArray;
@@ -44,14 +45,17 @@ public class RegistrationActivity extends ActionBarActivity {
     private EditText txtPhone;
     private Spinner spinner;
     private Activity activity;
+    private DB db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
+        db = new DB(this);
         Button btnRegister = (Button) findViewById(R.id.btnRegister);
         txtUsername = (EditText) findViewById(R.id.txtUsername);
         txtPhone = (EditText) findViewById(R.id.txtPhone);
+
         spinner = (Spinner) findViewById(R.id.country_spinner);
         activity = this;
         txtUsername.setOnEditorActionListener(new OnEditorActionListener() {

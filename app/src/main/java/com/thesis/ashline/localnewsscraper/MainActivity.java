@@ -3,30 +3,40 @@ package com.thesis.ashline.localnewsscraper;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.thesis.ashline.localnewsscraper.database.DB;
 import com.thesis.ashline.localnewsscraper.view.ArticleListActivity;
 import com.thesis.ashline.localnewsscraper.view.LoadingActivity;
 import com.thesis.ashline.localnewsscraper.view.RegistrationActivity;
 import com.thesis.ashline.localnewsscraper.view.SettingsActivity;
 import com.thesis.ashline.localnewsscraper.view.TestDBActivity;
 
+import java.io.IOException;
+
 
 public class MainActivity extends ActionBarActivity {
-
+    DB db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        testDB();
-//        if (userExists()) {
-//            openArticleList();
-//        } else {
-//            openRegistration();
-//        }
+        db = new DB(this);
+//        testDB();
+        if (userExists()) {
+            openArticleList();
+        } else {
+            try {
+                db.create();
+                openRegistration();
+            } catch (IOException e) {
+                //show alert
+            }
+        }
     }
 
     private boolean userExists() {
@@ -68,6 +78,12 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void testDB() {
+        Intent intent = new Intent(this, TestDBActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void loadDB() {
         Intent intent = new Intent(this, TestDBActivity.class);
         startActivity(intent);
         finish();

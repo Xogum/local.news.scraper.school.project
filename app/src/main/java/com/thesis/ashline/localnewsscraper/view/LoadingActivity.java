@@ -177,7 +177,7 @@ public class LoadingActivity extends Activity {
 //                            String msgBody = msg.getMessageBody();
 //                checkIf sms came from app
                             if (PhoneNumberUtils.compare(phonenumber, origNumber)) {
-                                Toast.makeText(getApplicationContext(), "Are same", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "Number verified", Toast.LENGTH_LONG).show();
                                 //send user registration call
                                 postUserRegistration(username, phonenumber);
 
@@ -216,6 +216,7 @@ public class LoadingActivity extends Activity {
     public void onResponseError(VolleyRequestFailed message) {
         try {
             NetworkResponse networkResponse = message.error.networkResponse;
+            //???
             if (networkResponse.statusCode == 403 && networkResponse.data != null) {
                 UserResponse userResponse = parseResponse(networkResponse);
                 saveUserToPreferences(userResponse.user);

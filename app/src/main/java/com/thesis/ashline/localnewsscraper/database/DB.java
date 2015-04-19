@@ -284,4 +284,25 @@ public class DB extends SQLiteOpenHelper {
 
         return cities;
     }
+
+    public Cursor getCityCursor(String args) {
+        String sqlQuery = "";
+        Cursor result = null;
+
+        sqlQuery  = " SELECT _id" + ", name ";
+        sqlQuery += " FROM " + TABLE_CITY;
+        sqlQuery += " WHERE name LIKE '%" + args + "%' ";
+        sqlQuery += " ORDER BY name";
+
+        if (db == null)
+        {
+            open();
+        }
+
+        if (db!=null)
+        {
+            result = db.rawQuery(sqlQuery, null);
+        }
+        return result;
+    }
 }

@@ -69,7 +69,7 @@ public class TestDBActivity extends ActionBarActivity {
             String cty = locations.get(0).county;
             String name = locations.get(0).name;
 
-            txtBox.setText( ctry + ":" + cty + ":" + name);
+            txtBox.setText( ctry + ":" + cty + ":" + name + " size:" + locations.size());
         } else {
             // error opening DB.
             txtBox.setText("hapana hapana");
