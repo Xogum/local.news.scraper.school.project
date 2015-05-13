@@ -3,8 +3,8 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="com.thesis.ashline.localnewsscraper.view.SettingsActivity$GeneralPreferenceFragment"
-        android:title="@string/pref_header_general" />
+        android:fragment="com.thesis.ashline.localnewsscraper.view.SettingsActivity$SearchPreferenceFragment"
+        android:title="@string/pref_header_search" />
 
     <header
         android:fragment="com.thesis.ashline.localnewsscraper.view.SettingsActivity$NotificationPreferenceFragment"

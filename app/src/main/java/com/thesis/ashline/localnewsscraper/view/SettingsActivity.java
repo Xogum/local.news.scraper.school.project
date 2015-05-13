@@ -39,7 +39,7 @@ public class SettingsActivity extends PreferenceActivity {
      * as a master/detail two-pane view on tablets. When true, a single pane is
      * shown on tablets.
      */
-    private static final boolean ALWAYS_SIMPLE_PREFS = false;
+    private static final boolean ALWAYS_SIMPLE_PREFS = true;
 
 
     @Override
@@ -62,9 +62,9 @@ public class SettingsActivity extends PreferenceActivity {
         // In the simplified UI, fragments are not used at all and we instead
         // use the older PreferenceActivity APIs.
 
-        // Add 'general' preferences.
-        addPreferencesFromResource(R.xml.pref_general);
-
+        // Add 'search' preferences.
+        addPreferencesFromResource(R.xml.pref_search);
+//todo remove this shit below
         // Add 'notifications' preferences, and a corresponding header.
         PreferenceCategory fakeHeader = new PreferenceCategory(this);
         fakeHeader.setTitle(R.string.pref_header_notifications);
@@ -76,7 +76,7 @@ public class SettingsActivity extends PreferenceActivity {
         fakeHeader.setTitle(R.string.pref_header_data_sync);
         getPreferenceScreen().addPreference(fakeHeader);
         addPreferencesFromResource(R.xml.pref_data_sync);
-
+//todo remove shit above
         // Add 'search results' preferences, and a corresponding header.
         fakeHeader = new PreferenceCategory(this);
         fakeHeader.setTitle(R.string.pref_header_page_size);
@@ -212,11 +212,11 @@ public class SettingsActivity extends PreferenceActivity {
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class GeneralPreferenceFragment extends PreferenceFragment {
+    public static class SearchPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_general);
+            addPreferencesFromResource(R.xml.pref_search);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are

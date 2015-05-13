@@ -35,7 +35,7 @@ public class CityListAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent)
     {
         final LayoutInflater inflater = LayoutInflater.from(context);
-        final TextView view = (TextView) inflater.inflate(R.layout.list_item, parent, false);
+        final TextView view = (TextView) inflater.inflate(R.layout.autocomplete_item, parent, false);
 
         String item = createItem(cursor);
         view.setText(item);
