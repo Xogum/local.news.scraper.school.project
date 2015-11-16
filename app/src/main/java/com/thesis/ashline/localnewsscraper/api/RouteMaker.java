@@ -199,7 +199,7 @@ public class RouteMaker {
                 ActionResponse.class);
     }
     /**
-     * send a GET request to test url
+     * send a GET request to test link
      * search
      *
      * @return request object

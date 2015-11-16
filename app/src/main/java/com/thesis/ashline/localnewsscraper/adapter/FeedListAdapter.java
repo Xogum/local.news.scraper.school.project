@@ -96,16 +96,16 @@ public class FeedListAdapter extends BaseAdapter {
             statusMsg.setVisibility(View.GONE);
         }
 
-        // Checking for null feed url
+        // Checking for null feed link
         if (item.url != null && item.url != "" ) {
             url.setText(Html.fromHtml("<a href=\"" + item.url + "\">"
                     + item.url + "</a> "));
 
-            // Making url clickable
+            // Making link clickable
             url.setMovementMethod(LinkMovementMethod.getInstance());
             url.setVisibility(View.VISIBLE);
         } else {
-            // url is null, remove from the view
+            // link is null, remove from the view
             url.setVisibility(View.GONE);
         }
 

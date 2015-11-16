@@ -1,7 +1,9 @@
 package com.thesis.ashline.localnewsscraper.view;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -25,6 +27,7 @@ public class ArticleActivity extends ActionBarActivity {
     private WebView webview;
     private String URL;
     private long articleId;
+    private long userId;
     private ShareActionProvider mShareActionProvider;
 
     @Override
@@ -36,6 +39,8 @@ public class ArticleActivity extends ActionBarActivity {
             URL = b.getString("article_url");
             articleId = Long.parseLong(b.getString("article_id"));
         }
+        SharedPreferences settings = getSharedPreferences(LoadingActivity.USER_DATA, Context.MODE_PRIVATE);
+        userId = settings.getLong("user_id", 0);
         webview = new WebView(this);
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setUserAgentString("Mozilla/5.0 (Linux; U; Android 2.2; en-us; " +
@@ -129,12 +134,12 @@ public class ArticleActivity extends ActionBarActivity {
     private void handleActionSelected(MenuItem item, String action) {
         if (item.isChecked()) {
             item.setChecked(false);
-            RouteMaker.deleteArticleAction(articleId, action, 0);
+            RouteMaker.deleteArticleAction(articleId, action, userId);
             Toast.makeText(this, "article removed from " + action, Toast.LENGTH_SHORT).show();
 
         } else {
             item.setChecked(true);
-            RouteMaker.postArticleAction(articleId, action, 0);
+            RouteMaker.postArticleAction(articleId, action, userId);
             Toast.makeText(this,
                     String.format(getResources().getString(R.string.added_action),
                             action),

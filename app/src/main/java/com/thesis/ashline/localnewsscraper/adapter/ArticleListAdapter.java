@@ -81,13 +81,13 @@ public class ArticleListAdapter extends BaseAdapter {
 
         name.setText(item.title);
 
-        id.setText((int) item.id);
+        id.setText(String.valueOf(item.id));
 
         // Converting timestamp into x ago format
-        CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
-                Long.parseLong(item.date),
-                System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
-        timestamp.setText(timeAgo);
+//        CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
+//                (long)(Float.parseFloat(item.date)*1000),
+//                System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
+        timestamp.setText(item.date);
 
         // Check for empty status message
         if (!TextUtils.isEmpty(item.summary)) {
@@ -98,16 +98,16 @@ public class ArticleListAdapter extends BaseAdapter {
             statusMsg.setVisibility(View.GONE);
         }
 
-        // Checking for null feed url
-        if (item.url != null) {
-            url.setText(Html.fromHtml("<a href=\"" + item.url + "\">"
-                    + item.url + "</a> "));
+        // Checking for null feed link
+        if (item.link != null) {
+            url.setText(Html.fromHtml("<a href=\"" + item.link + "\">"
+                    + item.link + "</a> "));
 
-            // Making url clickable
+            // Making link clickable
             url.setMovementMethod(LinkMovementMethod.getInstance());
             url.setVisibility(View.VISIBLE);
         } else {
-            // url is null, remove from the view
+            // link is null, remove from the view
             url.setVisibility(View.GONE);
         }
 
@@ -115,8 +115,8 @@ public class ArticleListAdapter extends BaseAdapter {
         profilePic.setImageUrl(item.icon_url, imageLoader);
 
         // Feed image
-        if (item.image_url != null) {
-            feedImageView.setImageUrl(item.image_url, imageLoader);
+        if (item.image_link != null) {
+            feedImageView.setImageUrl(item.image_link, imageLoader);
             feedImageView.setVisibility(View.VISIBLE);
             feedImageView
                     .setResponseObserver(new FeedImageView.ResponseObserver() {

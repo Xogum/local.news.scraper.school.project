@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.thesis.ashline.localnewsscraper"
-        minSdkVersion 8
+        minSdkVersion 9
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -26,4 +26,5 @@ dependencies {
     compile 'com.google.code.gson:gson:2.3.+'
     compile 'com.squareup:otto:1.3.5'
     compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.google.android.gms:play-services-location:7.8.0'
 }
