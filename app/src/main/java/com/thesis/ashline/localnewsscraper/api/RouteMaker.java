@@ -45,7 +45,7 @@ public class RouteMaker {
             try {
                 params.put(field.getName(), field.get(object).toString());
             } catch (IllegalAccessException e) {
-            }catch (NullPointerException e){
+            } catch (NullPointerException e){
                 params.put(field.getName(), "");
             }
         }
@@ -147,15 +147,12 @@ public class RouteMaker {
      * @return request object
      */
     public static OttoGsonRequest<ArticleListResponse> getArticles(final Search search) {
+        String url = articlesUrl + search.getQueryString();
+
         return new OttoGsonRequest<ArticleListResponse>(ServiceLocator.EventBus,
                 Request.Method.GET,
-                articlesUrl,
-                ArticleListResponse.class) {
-            @Override
-            protected Map<String, String> getParams() {
-                return makeParameterMap(search);
-            }
-        };
+                url,
+                ArticleListResponse.class);
     }
     /**todo this route might not be needed if i render the article in a webview
      * send a GET request to "/articles/aid"

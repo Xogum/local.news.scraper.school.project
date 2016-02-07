@@ -9,6 +9,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.ShareActionProvider;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
@@ -17,8 +18,14 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import com.squareup.otto.Subscribe;
 import com.thesis.ashline.localnewsscraper.R;
+import com.thesis.ashline.localnewsscraper.api.OttoGsonRequest;
 import com.thesis.ashline.localnewsscraper.api.RouteMaker;
+import com.thesis.ashline.localnewsscraper.api.ServiceLocator;
+import com.thesis.ashline.localnewsscraper.api.messages.VolleyRequestFailed;
+import com.thesis.ashline.localnewsscraper.model.ActionResponse;
+import com.thesis.ashline.localnewsscraper.model.ActivityViewModel;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,12 +35,18 @@ public class ArticleActivity extends ActionBarActivity {
     private String URL;
     private long articleId;
     private long userId;
+    public static final int REGISTER_MODE = 1;
+    private ActivityViewModel _model;
     private ShareActionProvider mShareActionProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_PROGRESS);
         super.onCreate(savedInstanceState);
+        //            ----------------------
+        ServiceLocator.ensureInitialized(this);
+        _model = new ActivityViewModel();
+        //            ----------------------
         Bundle b = getIntent().getExtras();
         if (b != null) {
             URL = b.getString("article_url");
@@ -65,6 +78,25 @@ public class ArticleActivity extends ActionBarActivity {
         loadWebviewContent();
         setContentView(webview);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (_model.listenForResponse) {
+            ServiceLocator.EventBus.register(this);
+            ServiceLocator.ResponseBuffer.stopAndProcess();
+        }
+        //todo maybe if loading show loader
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (_model.listenForResponse) {
+            ServiceLocator.ResponseBuffer.startSaving();
+            ServiceLocator.EventBus.unregister(this);
+        }
     }
 
     private void loadWebviewContent() {
@@ -107,15 +139,6 @@ public class ArticleActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
 
         switch (item.getItemId()) {
-            case R.id.action_share:
-                Intent shareIntent = new Intent();
-                shareIntent.setAction(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_TEXT, URL);
-                shareIntent.setType("text/plain");
-                setShareIntent(shareIntent);
-                startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.share_with)));
-
-                break;
             case R.id.action_save:
                 handleActionSelected(item, "saves");
 
@@ -132,18 +155,40 @@ public class ArticleActivity extends ActionBarActivity {
     }
 
     private void handleActionSelected(MenuItem item, String action) {
+        OttoGsonRequest<ActionResponse> actionRequest;
+
         if (item.isChecked()) {
             item.setChecked(false);
-            RouteMaker.deleteArticleAction(articleId, action, userId);
+            actionRequest = RouteMaker.deleteArticleAction(articleId, action, userId);
+            Log.d("OVDR", "Request begin: " + actionRequest.requestId);
+            ServiceLocator.VolleyRequestQueue.add(actionRequest);
             Toast.makeText(this, "article removed from " + action, Toast.LENGTH_SHORT).show();
 
         } else {
             item.setChecked(true);
-            RouteMaker.postArticleAction(articleId, action, userId);
+            actionRequest = RouteMaker.postArticleAction(articleId, action, userId);
+            Log.d("OVDR", "Request begin: " + actionRequest.requestId);
+            ServiceLocator.VolleyRequestQueue.add(actionRequest);
             Toast.makeText(this,
                     String.format(getResources().getString(R.string.added_action),
                             action),
                     Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void registerServiceBus(boolean register) {
+        if (register) {
+            ServiceLocator.EventBus.register(this);
+            ServiceLocator.ResponseBuffer.stopAndProcess();
+        } else {
+            ServiceLocator.ResponseBuffer.startSaving();
+            ServiceLocator.EventBus.unregister(this);
+        }
+    }
+
+    @Subscribe
+    public void onResponseError(VolleyRequestFailed message) {
+        //todo test this
+        Toast.makeText(this, "Network request Error", Toast.LENGTH_SHORT).show();
     }
 }

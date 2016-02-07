@@ -359,7 +359,7 @@ public class ArticleListActivity extends ActionBarActivity
                 Search search = new Search();
                 //todo fill search
                 //add userid to search, for logging
-                search.user_id = userId;
+                search.put("user_id", userId);
                 articleRequest = RouteMaker.getArticles(search);
                 Log.d("OVDR", "Request begin: " + articleRequest.requestId);
                 ServiceLocator.VolleyRequestQueue.add(articleRequest);
