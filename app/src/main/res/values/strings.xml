@@ -42,5 +42,9 @@
     <string name="logo">logo</string>
     <string name="country_code">Country</string>
     <string name="title_activity_test_db">TestDBActivity</string>
+    <string name="likes">Likes:</string>
+    <string name="favourites">Favourites:</string>
+    <string name="saves">Saves:</string>
+    <string name="reads">Reads:</string>
 
 </resources>

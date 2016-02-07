@@ -13,6 +13,7 @@ public class Article {
     public int readz;
     public int likes;
     public int shares;
+    public int saves;
     public int favourites;
     public int iread;
     public int iliked;

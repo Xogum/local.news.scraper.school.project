@@ -72,6 +72,11 @@ public class ArticleListAdapter extends BaseAdapter {
                 .findViewById(R.id.txtStatusMsg);
         TextView url = (TextView) convertView.findViewById(R.id.txtUrl);
         TextView id = (TextView) convertView.findViewById(R.id.txtId);
+
+        TextView likeCount = (TextView) convertView.findViewById(R.id.likeCount);
+        TextView readCount = (TextView) convertView.findViewById(R.id.readCount);
+        TextView saveCount = (TextView) convertView.findViewById(R.id.saveCount);
+
         NetworkImageView profilePic = (NetworkImageView) convertView
                 .findViewById(R.id.profilePic);
         FeedImageView feedImageView = (FeedImageView) convertView
@@ -83,13 +88,19 @@ public class ArticleListAdapter extends BaseAdapter {
 
         id.setText(String.valueOf(item.id));
 
+        // date
         // Converting timestamp into x ago format
 //        CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
 //                (long)(Float.parseFloat(item.date)*1000),
 //                System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
         timestamp.setText(item.date);
 
-        // Check for empty status message
+        // action counts
+        likeCount.setText(String.valueOf(item.likes));
+        saveCount.setText(String.valueOf(item.saves));
+        readCount.setText(String.valueOf(item.readz));
+
+        // Check for empty summary
         if (!TextUtils.isEmpty(item.summary)) {
             statusMsg.setText(item.summary);
             statusMsg.setVisibility(View.VISIBLE);

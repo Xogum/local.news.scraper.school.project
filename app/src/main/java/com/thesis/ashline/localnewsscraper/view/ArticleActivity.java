@@ -77,7 +77,15 @@ public class ArticleActivity extends ActionBarActivity {
 
         loadWebviewContent();
         setContentView(webview);
+        markArticleAsRead();
 
+    }
+
+    private void markArticleAsRead() {
+        OttoGsonRequest<ActionResponse> actionRequest;
+        actionRequest = RouteMaker.postArticleAction(articleId, "reads", userId);
+        Log.d("OVDR", "Request begin: " + actionRequest.requestId);
+        ServiceLocator.VolleyRequestQueue.add(actionRequest);
     }
 
     @Override
