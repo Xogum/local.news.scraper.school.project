@@ -35,6 +35,9 @@ public class ArticleActivity extends ActionBarActivity {
     private String URL;
     private long articleId;
     private long userId;
+    boolean iliked;
+    boolean isaved;
+    boolean ifavourited;
     public static final int REGISTER_MODE = 1;
     private ActivityViewModel _model;
     private ShareActionProvider mShareActionProvider;
@@ -50,7 +53,10 @@ public class ArticleActivity extends ActionBarActivity {
         Bundle b = getIntent().getExtras();
         if (b != null) {
             URL = b.getString("article_url");
-            articleId = Long.parseLong(b.getString("article_id"));
+            articleId = b.getLong("article_id");
+            iliked = (b.getInt("iliked") != 0);
+            isaved = (b.getInt("isaved") != 0);
+            ifavourited = (b.getInt("ifavourited") != 0);
         }
         SharedPreferences settings = getSharedPreferences(LoadingActivity.USER_DATA, Context.MODE_PRIVATE);
         userId = settings.getLong("user_id", 0);
@@ -123,6 +129,15 @@ public class ArticleActivity extends ActionBarActivity {
 
         // Locate MenuItem with ShareActionProvider
         MenuItem item = menu.findItem(R.id.action_share);
+
+        // initialise actions
+        MenuItem likeOption = menu.findItem(R.id.action_like);
+        MenuItem saveOption = menu.findItem(R.id.action_save);
+        MenuItem favouriteOption = menu.findItem(R.id.action_favourite);
+
+        likeOption.setChecked(iliked);
+        saveOption.setChecked(isaved);
+        favouriteOption.setChecked(ifavourited);
 
         // Fetch and store ShareActionProvider
         mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);

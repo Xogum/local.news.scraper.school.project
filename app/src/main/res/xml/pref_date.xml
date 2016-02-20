@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.thesis.ashline.localnewsscraper.view.DatePreference
+        android:key="date_from"
+        android:title="@string/pref_date_from"
+        android:defaultValue="2014-08-01"
+        android:summary="Summary"/>
+
+    <com.thesis.ashline.localnewsscraper.view.DatePreference
+        android:key="date_to"
+        android:title="@string/pref_date_to"
+        android:defaultValue="2014-08-01"
+        android:summary="Summary"/>
+</PreferenceScreen>

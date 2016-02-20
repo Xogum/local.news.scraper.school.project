@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/feed_bg"
-    android:orientation="vertical"
-    android:onClick="showDetails">
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="fill_parent"

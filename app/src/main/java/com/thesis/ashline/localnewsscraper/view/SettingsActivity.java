@@ -3,9 +3,6 @@ package com.thesis.ashline.localnewsscraper.view;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -14,8 +11,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
-import android.text.TextUtils;
 
 import com.thesis.ashline.localnewsscraper.R;
 
@@ -62,35 +57,25 @@ public class SettingsActivity extends PreferenceActivity {
         // In the simplified UI, fragments are not used at all and we instead
         // use the older PreferenceActivity APIs.
 
-        // Add 'search' preferences.
-        addPreferencesFromResource(R.xml.pref_search);
-//todo remove this shit below
-        // Add 'notifications' preferences, and a corresponding header.
+        // Add preferences container.
+        addPreferencesFromResource(R.xml.pref_container);
+        // Add general 'search results' preferences, and a corresponding header.
         PreferenceCategory fakeHeader = new PreferenceCategory(this);
-        fakeHeader.setTitle(R.string.pref_header_notifications);
-        getPreferenceScreen().addPreference(fakeHeader);
-        addPreferencesFromResource(R.xml.pref_notification);
-
-        // Add 'data and sync' preferences, and a corresponding header.
-        fakeHeader = new PreferenceCategory(this);
-        fakeHeader.setTitle(R.string.pref_header_data_sync);
-        getPreferenceScreen().addPreference(fakeHeader);
-        addPreferencesFromResource(R.xml.pref_data_sync);
-//todo remove shit above
-        // Add 'search results' preferences, and a corresponding header.
-        fakeHeader = new PreferenceCategory(this);
-        fakeHeader.setTitle(R.string.pref_header_page_size);
+        fakeHeader.setTitle(R.string.pref_settings_header);
         getPreferenceScreen().addPreference(fakeHeader);
         addPreferencesFromResource(R.xml.pref_page_size);
 
-        // Bind the summaries of EditText/List/Dialog/Ringtone preferences to
-        // their values. When their values change, their summaries are updated
-        // to reflect the new value, per the Android Design guidelines.
-        bindPreferenceSummaryToValue(findPreference("example_text"));
-        bindPreferenceSummaryToValue(findPreference("example_list"));
-        bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
-        bindPreferenceSummaryToValue(findPreference("sync_frequency"));
+        // Add 'data and sync' preferences, and a corresponding header.
+        fakeHeader = new PreferenceCategory(this);
+        fakeHeader.setTitle(R.string.pref_date_header);
+        getPreferenceScreen().addPreference(fakeHeader);
+        addPreferencesFromResource(R.xml.pref_date);
+
+        bindPreferenceSummaryToValue(findPreference("date_from"));
+        bindPreferenceSummaryToValue(findPreference("date_to"));
         bindPreferenceSummaryToValue(findPreference("page_size"));
+        bindPreferenceSummaryToValue(findPreference("radius"));
+        bindPreferenceSummaryToValue(findPreference("category"));
     }
 
     /**
@@ -154,29 +139,6 @@ public class SettingsActivity extends PreferenceActivity {
                         index >= 0
                                 ? listPreference.getEntries()[index]
                                 : null);
-
-            } else if (preference instanceof RingtonePreference) {
-                // For ringtone preferences, look up the correct display value
-                // using RingtoneManager.
-                if (TextUtils.isEmpty(stringValue)) {
-                    // Empty values correspond to 'silent' (no ringtone).
-                    preference.setSummary(R.string.pref_ringtone_silent);
-
-                } else {
-                    Ringtone ringtone = RingtoneManager.getRingtone(
-                            preference.getContext(), Uri.parse(stringValue));
-
-                    if (ringtone == null) {
-                        // Clear the summary if there was a lookup error.
-                        preference.setSummary(null);
-                    } else {
-                        // Set the summary to reflect the new ringtone display
-                        // name.
-                        String name = ringtone.getTitle(preference.getContext());
-                        preference.setSummary(name);
-                    }
-                }
-
             } else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
@@ -205,82 +167,5 @@ public class SettingsActivity extends PreferenceActivity {
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
-    }
-
-    /**
-     * This fragment shows general preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class SearchPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_search);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(findPreference("example_text"));
-            bindPreferenceSummaryToValue(findPreference("example_list"));
-        }
-    }
-
-    /**
-     * This fragment shows notification preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class NotificationPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_notification);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
-        }
-    }
-
-    /**
-     * This fragment shows data and sync preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class DataSyncPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_data_sync);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(findPreference("sync_frequency"));
-        }
-    }
-
-    /**
-     * This fragment shows page size preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class PageSizePreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_page_size);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(findPreference("page_size"));
-        }
     }
 }

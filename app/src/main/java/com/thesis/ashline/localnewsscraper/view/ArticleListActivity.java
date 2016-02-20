@@ -2,6 +2,7 @@ package com.thesis.ashline.localnewsscraper.view;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -17,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -306,7 +308,7 @@ public class ArticleListActivity extends ActionBarActivity
 
     private ArrayList<Article> switchImages(ArrayList<Article> articles) {
         for(Article article: articles) {
-            if(article.image_link.contains("thumb")) {
+            if(article.image_link != null && article.image_link.contains("thumb")) {
                 article.icon_url = article.image_link;
                 article.image_link = null;
             } else {
@@ -705,7 +707,7 @@ public class ArticleListActivity extends ActionBarActivity
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment {
+    public static class PlaceholderFragment extends Fragment implements AdapterView.OnItemClickListener {
         /**
          * The fragment argument representing the section number for this
          * fragment.
@@ -759,6 +761,33 @@ public class ArticleListActivity extends ActionBarActivity
             return rootView;
         }
 
+        // onclicklistener for list items
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            int count = 1;
+            Intent intent = new Intent(this.getActivity(), ArticleActivity.class);
+            Article article = (Article) adapterView.getAdapter().getItem(i);
+
+            // add link to intent extras
+            TextView urlTextView = (TextView) view.findViewById(R.id.txtUrl);
+//        TextView idTextView = (TextView) view.findViewById(R.id.txtId);
+            // increase readCount
+            TextView readCountTextView = (TextView) view.findViewById(R.id.readCount);
+            count += Integer.parseInt(readCountTextView.getText().toString());
+            readCountTextView.setText(String.valueOf(count));
+
+            String url = urlTextView.getText().toString();
+//        String id = idTextView.getText().toString();
+
+            intent.putExtra("article_url", url);
+            intent.putExtra("article_id", article.id);
+            intent.putExtra("iliked", article.iliked);
+            intent.putExtra("isaved", article.isaved);
+            intent.putExtra("ifavourited", article.ifavourited);
+
+            startActivity(intent);
+        }
+
         @Override
         public void onAttach(Activity activity) {
             super.onAttach(activity);
@@ -776,6 +805,7 @@ public class ArticleListActivity extends ActionBarActivity
         public void renderArticles(ArrayList<Article> articles) {
             //todo handle different responses, shares/likes etc
             listView.setAdapter(articleListAdapter);
+            listView.setOnItemClickListener(this);
             this.articleList.addAll(articles);
             // notify data changes to list adapter
             articleListAdapter.notifyDataSetChanged();

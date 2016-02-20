@@ -18,6 +18,7 @@ public class Article {
     public int iread;
     public int iliked;
     public int ishared;
+    public int isaved;
     public int ifavourited;
     public String latitude;
     public String longitude;
