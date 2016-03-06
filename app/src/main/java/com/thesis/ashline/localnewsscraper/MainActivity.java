@@ -3,9 +3,9 @@ package com.thesis.ashline.localnewsscraper;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -13,7 +13,6 @@ import com.thesis.ashline.localnewsscraper.database.DB;
 import com.thesis.ashline.localnewsscraper.view.ArticleListActivity;
 import com.thesis.ashline.localnewsscraper.view.LoadingActivity;
 import com.thesis.ashline.localnewsscraper.view.RegistrationActivity;
-import com.thesis.ashline.localnewsscraper.view.SettingsActivity;
 import com.thesis.ashline.localnewsscraper.view.TestDBActivity;
 
 import java.io.IOException;
@@ -25,6 +24,8 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // init preferences
+        initialiseSettings();
         db = new DB(this);
 //        testDB();
         if (userExists()) {
@@ -94,5 +95,11 @@ public class MainActivity extends ActionBarActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private void initialiseSettings() {
+        PreferenceManager.setDefaultValues(this, R.xml.pref_date, false);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_page_size, false);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_sorting, false);
     }
 }

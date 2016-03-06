@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceScreen
+        android:key="sorting_subscreen"
+        android:title="@string/pref_order_by_header"
+        android:persistent="false">
+        <PreferenceCategory
+            android:title="likes"
+            android:key="order_by_likes_cat">
+            <CheckBoxPreference
+                android:key="order_by_likes"
+                android:title="order by likes"
+                android:defaultValue="true"/>
+            <CheckBoxPreference
+                android:key="order_by_likes_descending"
+                android:title="descending"
+                android:defaultValue="true"
+                android:dependency="order_by_likes"/>
+        </PreferenceCategory>
+        <PreferenceCategory
+            android:title="distance"
+            android:key="order_by_distance_cat">
+            <CheckBoxPreference
+                android:key="order_by_distance"
+                android:title="order by distance"
+                android:defaultValue="true"/>
+            <CheckBoxPreference
+                android:key="order_by_distance_descending"
+                android:title="descending"
+                android:defaultValue="false"
+                android:dependency="order_by_distance"/>
+        </PreferenceCategory>
+        <PreferenceCategory
+            android:title="date"
+            android:key="order_by_date_cat">
+            <CheckBoxPreference
+                android:key="order_by_date"
+                android:title="order by date"
+                android:defaultValue="false"/>
+            <CheckBoxPreference
+                android:key="order_by_date_descending"
+                android:title="descending"
+                android:defaultValue="false"
+                android:dependency="order_by_date"/>
+        </PreferenceCategory>
+    </PreferenceScreen>
+</PreferenceScreen>

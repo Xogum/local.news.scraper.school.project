@@ -6,12 +6,11 @@
     <com.thesis.ashline.localnewsscraper.view.DatePreference
         android:key="date_from"
         android:title="@string/pref_date_from"
-        android:defaultValue="2014-08-01"
-        android:summary="Summary"/>
+        android:defaultValue="1000-01-01"
+        android:summary="date from"/>
 
     <com.thesis.ashline.localnewsscraper.view.DatePreference
         android:key="date_to"
         android:title="@string/pref_date_to"
-        android:defaultValue="2014-08-01"
-        android:summary="Summary"/>
+        android:summary="date to"/>
 </PreferenceScreen>

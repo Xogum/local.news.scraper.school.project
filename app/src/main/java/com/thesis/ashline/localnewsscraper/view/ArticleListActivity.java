@@ -2,32 +2,30 @@ package com.thesis.ashline.localnewsscraper.view;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
+import android.location.Location;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.location.Location;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -56,6 +54,7 @@ import com.thesis.ashline.localnewsscraper.model.TestFeedResponse.FeedItem;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class ArticleListActivity extends ActionBarActivity
@@ -87,6 +86,8 @@ public class ArticleListActivity extends ActionBarActivity
     private final int SAVES = 5;
     private final int SHARES = 6;
     private final int TEST = 7;
+    private SharedPreferences prefs;
+    private Search search;
     private final String[] actions = {"", "", "reads", "likes", "favourites", "saves", "shares"};
 //    private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
@@ -366,10 +367,8 @@ public class ArticleListActivity extends ActionBarActivity
             case SEARCH:
                 mTitle = getString(R.string.title_section1);
 //                onActionSelected(SEARCH);
-                Search search = new Search();
-                //todo fill search
-                //add userid to search, for logging
-                search.put("user_id", userId);
+                search = getSearch();
+
                 articleRequest = RouteMaker.getArticles(search);
                 Log.d("OVDR", "Request begin: " + articleRequest.requestId);
                 ServiceLocator.VolleyRequestQueue.add(articleRequest);
@@ -702,6 +701,57 @@ public class ArticleListActivity extends ActionBarActivity
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         updateLocationUI();
+    }
+
+    public Search getSearch() {
+        /**    possible params
+         *  long user_id;
+         *  long category_id;
+         *  String date_to;
+         *  String date_from;
+         *  String longitude;
+         *  String latitude;
+         */
+
+        String location;
+        String[] coordinates;
+
+        if(search == null) {
+            search = new Search();
+        }
+        if(prefs == null) {
+            prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        }
+
+        search.put("user_id", userId);
+        search.put("category_id", prefs.getString("category", ""));
+        search.put("date_from", prefs.getString("date_from", ""));
+        search.put("date_to", prefs.getString("date_to", ""));
+        search.put("radius", prefs.getString("radius", ""));
+
+        //  get location
+        location = prefs.getString("location", "");
+
+        if(!"".equals(location)) {
+            coordinates = location.split(",");
+            search.put("lat", coordinates[0]);
+            search.put("lng", coordinates[1]);
+        }
+
+        // sorting
+        if(prefs.getBoolean("order_by_likes", false)) {
+            search.putSortParameter("likes", prefs.getBoolean("order_by_likes_descending", false));
+        }
+
+        if(prefs.getBoolean("order_by_distance", false)) {
+            search.putSortParameter("distance", prefs.getBoolean("order_by_distance_descending", false));
+        }
+
+        if(prefs.getBoolean("order_by_date", false)) {
+            search.putSortParameter("date", prefs.getBoolean("order_by_date_descending", false));
+        }
+
+        return search;
     }
 
     /**

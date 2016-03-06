@@ -14,6 +14,8 @@ import android.preference.PreferenceManager;
 
 import com.thesis.ashline.localnewsscraper.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -64,18 +66,28 @@ public class SettingsActivity extends PreferenceActivity {
         fakeHeader.setTitle(R.string.pref_settings_header);
         getPreferenceScreen().addPreference(fakeHeader);
         addPreferencesFromResource(R.xml.pref_page_size);
+        // Add sorting preferences, and a corresponding header.
+        addPreferencesFromResource(R.xml.pref_sorting);
 
-        // Add 'data and sync' preferences, and a corresponding header.
+        // Add 'date' preferences, and a corresponding header.
         fakeHeader = new PreferenceCategory(this);
         fakeHeader.setTitle(R.string.pref_date_header);
         getPreferenceScreen().addPreference(fakeHeader);
         addPreferencesFromResource(R.xml.pref_date);
+
+
+        // set default date to to today
+        String date = new SimpleDateFormat("yyy-MM-dd").format(new Date());
+        DatePreference dateTo = (DatePreference) findPreference("date_to");
+        dateTo.setDefaultValue(date);
 
         bindPreferenceSummaryToValue(findPreference("date_from"));
         bindPreferenceSummaryToValue(findPreference("date_to"));
         bindPreferenceSummaryToValue(findPreference("page_size"));
         bindPreferenceSummaryToValue(findPreference("radius"));
         bindPreferenceSummaryToValue(findPreference("category"));
+        bindPreferenceSummaryToValue(findPreference("location"));
+
     }
 
     /**
@@ -103,9 +115,7 @@ public class SettingsActivity extends PreferenceActivity {
      * "simplified" settings UI should be shown.
      */
     private static boolean isSimplePreferences(Context context) {
-        return ALWAYS_SIMPLE_PREFS
-                || Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB
-                || !isXLargeTablet(context);
+        return true;
     }
 
     /**
@@ -114,9 +124,7 @@ public class SettingsActivity extends PreferenceActivity {
     @Override
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public void onBuildHeaders(List<Header> target) {
-        if (!isSimplePreferences(this)) {
-            loadHeadersFromResource(R.xml.pref_headers, target);
-        }
+        return;
     }
 
     /**

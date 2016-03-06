@@ -4,7 +4,7 @@
     <!-- Strings related to Settings -->
 
     <!-- search settings-->
-    <string name="pref_settings_header">Search results</string>
+    <string name="pref_settings_header">Search parameters</string>
     <!-- page size settings-->
     <string name="pref_title_search_page_size">Number of results to show</string>
     <string-array name="pref_search_page_size_titles">
@@ -67,4 +67,48 @@
     <string name="pref_date_header">Publication date</string>
     <string name="pref_date_from">From</string>
     <string name="pref_date_to">To</string>
+    <!-- sorting settings-->
+    <string name="pref_order_by_header">Sorting</string>
+    <!-- location settings-->
+    <string name="pref_location_title">Location</string>
+    <string-array name="pref_location_titles">
+        <item>actual location</item>
+        <item>lancashire (53.8, 2.6)</item>
+        <item>southport (53.6454, 3.0083)</item>
+        <item>burnley (53.789, 2.248)</item>
+        <item>chorley (53.653, 2.632)</item>
+        <item>leyland (53.692, 2.697)</item>
+        <item>preston (53.7632, 2.7031)</item>
+        <item>clitheroe (53.8711, 2.3916)</item>
+        <item>craven (53.95, 2.02)</item>
+        <item>accrington (53.7534, 2.3638)</item>
+        <item>lancaster (54.047, 2.801)</item>
+        <item>lytham (53.7426, 2.997)</item>
+        <item>pendle (53.869, 2.164)</item>
+        <item>rossendale (53.6833, 2.25)</item>
+        <item>garstang (53.6833, 2.25)</item>
+        <item>blackpool (53.8142, 3.0503)</item>
+        <item>ribble valley (53.8833, 2.4)</item>
+        <item>morecambe (54.064, 2.8786)</item>
+    </string-array>
+    <string-array name="pref_location_values">
+        <item></item>
+        <item>53.8,2.6</item>
+        <item>53.6454,3.0083</item>
+        <item>53.789,2.248</item>
+        <item>53.653,2.632</item>
+        <item>53.692,2.697</item>
+        <item>53.7632,2.7031</item>
+        <item>53.8711,2.3916</item>
+        <item>53.95,2.02</item>
+        <item>53.7534,2.3638</item>
+        <item>54.047,2.801</item>
+        <item>53.7426,2.997</item>
+        <item>53.869,2.164</item>
+        <item>53.6833,2.25</item>
+        <item>53.6833,2.25</item>
+        <item>53.8142,3.0503</item>
+        <item>53.8833,2.4</item>
+        <item>54.064,2.8786</item>
+    </string-array>
 </resources>
