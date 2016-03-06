@@ -5,6 +5,19 @@
         android:title="@string/pref_order_by_header"
         android:persistent="false">
         <PreferenceCategory
+            android:title="reads"
+            android:key="order_by_reads_cat">
+            <CheckBoxPreference
+                android:key="order_by_reads"
+                android:title="order by reads"
+                android:defaultValue="false"/>
+            <CheckBoxPreference
+                android:key="order_by_reads_descending"
+                android:title="descending"
+                android:defaultValue="false"
+                android:dependency="order_by_reads"/>
+        </PreferenceCategory>
+        <PreferenceCategory
             android:title="likes"
             android:key="order_by_likes_cat">
             <CheckBoxPreference

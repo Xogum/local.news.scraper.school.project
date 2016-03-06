@@ -9,8 +9,15 @@
         android:defaultValue="1000-01-01"
         android:summary="date from"/>
 
+    <CheckBoxPreference
+        android:key="date_to_today"
+        android:title="up to today"
+        android:disableDependentsState="true"
+        android:defaultValue="true"/>
+
     <com.thesis.ashline.localnewsscraper.view.DatePreference
         android:key="date_to"
         android:title="@string/pref_date_to"
+        android:dependency="date_to_today"
         android:summary="date to"/>
 </PreferenceScreen>

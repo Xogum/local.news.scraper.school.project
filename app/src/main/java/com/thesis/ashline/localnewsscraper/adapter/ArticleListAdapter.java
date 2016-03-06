@@ -66,6 +66,7 @@ public class ArticleListAdapter extends BaseAdapter {
             imageLoader = AppController.getInstance(applicationContext).getImageLoader();
 
         TextView name = (TextView) convertView.findViewById(R.id.name);
+        TextView distance = (TextView) convertView.findViewById(R.id.distance);
         TextView timestamp = (TextView) convertView
                 .findViewById(R.id.timestamp);
         TextView statusMsg = (TextView) convertView
@@ -85,14 +86,11 @@ public class ArticleListAdapter extends BaseAdapter {
         Article item = articles.get(position);
 
         name.setText(item.title);
+        distance.setText(String.format("%.2f", item.distance) + " km away");
 
         id.setText(String.valueOf(item.id));
 
         // date
-        // Converting timestamp into x ago format
-//        CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
-//                (long)(Float.parseFloat(item.date)*1000),
-//                System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
         timestamp.setText(item.date);
 
         // action counts

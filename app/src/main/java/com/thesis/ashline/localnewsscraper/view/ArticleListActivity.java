@@ -86,6 +86,7 @@ public class ArticleListActivity extends ActionBarActivity
     private final int SAVES = 5;
     private final int SHARES = 6;
     private final int TEST = 7;
+    private int currentList = -1;
     private SharedPreferences prefs;
     private Search search;
     private final String[] actions = {"", "", "reads", "likes", "favourites", "saves", "shares"};
@@ -363,6 +364,8 @@ public class ArticleListActivity extends ActionBarActivity
     public void onSectionAttached(int number) {
         OttoGsonRequest<TestFeedResponse> testRequest;
         OttoGsonRequest<ArticleListResponse> articleRequest;
+
+        currentList = number;
         switch (number) {
             case SEARCH:
                 mTitle = getString(R.string.title_section1);
@@ -455,16 +458,20 @@ public class ArticleListActivity extends ActionBarActivity
 
         //noinspection SimplifiableIfStatement
         switch (id) {
+            case R.id.action_refresh:
+                onSectionAttached(currentList);
+                return true;
             case R.id.action_settings:
                 openSettings();
                 return true;
-            case R.id.action_example:
-                SharedPreferences preferences = getSharedPreferences(LoadingActivity.USER_DATA, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.clear();
-                editor.commit();
-                Toast.makeText(this, "user prefs cleared", Toast.LENGTH_SHORT).show();
-                return true;
+//            case R.id.action_reset_user:
+//                SharedPreferences preferences = getSharedPreferences(LoadingActivity.USER_DATA, Context.MODE_PRIVATE);
+//                SharedPreferences.Editor editor = preferences.edit();
+//                editor.clear();
+//                editor.commit();
+//                Toast.makeText(this, "user prefs cleared", Toast.LENGTH_SHORT).show();
+//                //todo send request to backend to delete user
+//                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -725,9 +732,12 @@ public class ArticleListActivity extends ActionBarActivity
 
         search.put("user_id", userId);
         search.put("category_id", prefs.getString("category", ""));
-        search.put("date_from", prefs.getString("date_from", ""));
-        search.put("date_to", prefs.getString("date_to", ""));
         search.put("radius", prefs.getString("radius", ""));
+        search.put("date_from", prefs.getString("date_from", ""));
+
+        if(!prefs.getBoolean("date_to_today", false)) {
+            search.put("date_to", prefs.getString("date_to", ""));
+        }
 
         //  get location
         location = prefs.getString("location", "");
@@ -741,6 +751,10 @@ public class ArticleListActivity extends ActionBarActivity
         // sorting
         if(prefs.getBoolean("order_by_likes", false)) {
             search.putSortParameter("likes", prefs.getBoolean("order_by_likes_descending", false));
+        }
+
+        if(prefs.getBoolean("order_by_reads", false)) {
+            search.putSortParameter("reads", prefs.getBoolean("order_by_reads_descending", false));
         }
 
         if(prefs.getBoolean("order_by_distance", false)) {

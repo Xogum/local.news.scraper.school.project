@@ -20,6 +20,7 @@ public class Article {
     public int ishared;
     public int isaved;
     public int ifavourited;
+    public float distance;
     public String latitude;
     public String longitude;
     public String image_link;

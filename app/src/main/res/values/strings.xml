@@ -16,7 +16,8 @@
     <string name="title_section7">test</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_example">refresh</string>
+    <string name="action_refresh">refresh</string>
+    <string name="action_reset_user">reset user preferences</string>
     <string name="action_articles">Articles</string>
     <string name="title_activity_article">ArticleActivity</string>
     <string name="hello_world">Hello world!</string>
