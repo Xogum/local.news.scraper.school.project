@@ -102,7 +102,7 @@ public class ArticleListAdapter extends BaseAdapter {
 
         // Check for empty summary
         if (!TextUtils.isEmpty(item.summary)) {
-            statusMsg.setText(item.summary);
+            statusMsg.setText(Html.fromHtml(item.summary));
             statusMsg.setVisibility(View.VISIBLE);
         } else {
             // status is empty, remove from view
