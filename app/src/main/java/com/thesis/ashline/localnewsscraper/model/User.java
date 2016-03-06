@@ -8,6 +8,6 @@ public class User {
     public String username;
     public String phone_number;
     public Boolean is_active;
-    public String date_of_birth;
-    public String joining_date;
+    public long date_of_birth;
+    public long joining_date;
 }

@@ -1,5 +1,8 @@
 package com.thesis.ashline.localnewsscraper.view;
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
 import android.support.v7.app.ActionBar;
@@ -20,9 +23,14 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.thesis.ashline.localnewsscraper.R;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -55,6 +63,7 @@ public class NavigationDrawerFragment extends Fragment {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerListView;
     private View mFragmentContainerView;
+    private TextView mLocationTextView;
 
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
@@ -70,6 +79,7 @@ public class NavigationDrawerFragment extends Fragment {
         // Read in the flag indicating whether or not the user has demonstrated awareness of the
         // drawer. See PREF_USER_LEARNED_DRAWER for details.
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
         mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);
 
         if (savedInstanceState != null) {
@@ -91,8 +101,10 @@ public class NavigationDrawerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mDrawerListView = (ListView) inflater.inflate(
+        View view = inflater.inflate(
                 R.layout.fragment_navigation_drawer, container, false);
+        mDrawerListView = (ListView) view.findViewById(R.id.filterList);
+        mLocationTextView = (TextView) view.findViewById(R.id.locationText);
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -113,7 +125,7 @@ public class NavigationDrawerFragment extends Fragment {
                         getString(R.string.title_section7),
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
-        return mDrawerListView;
+        return view;
     }
 
     public boolean isDrawerOpen() {
@@ -172,7 +184,27 @@ public class NavigationDrawerFragment extends Fragment {
                             .getDefaultSharedPreferences(getActivity());
                     sp.edit().putBoolean(PREF_USER_LEARNED_DRAWER, true).commit();
                 }
+                SharedPreferences settings = getActivity()
+                        .getSharedPreferences(LoadingActivity.USER_DATA, Context.MODE_PRIVATE);
+                Float locationLng = settings.getFloat("user_location_lng", 0);
+                Float locationLat = settings.getFloat("user_location_lat", 0);
+                String locationString = "lat: " + String.valueOf(locationLat) +
+                        "\nlng: " + String.valueOf(locationLng);
 
+                Geocoder gcd = new Geocoder( drawerView.getContext(), Locale.getDefault());
+
+                List<Address> addresses = null;
+                try {
+                    addresses = gcd.getFromLocation(locationLat, locationLng, 1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if (addresses.size() > 0)
+                    locationString += "\n" + addresses.get(0).getLocality();
+
+
+                mLocationTextView.setText(locationString);
                 getActivity().supportInvalidateOptionsMenu(); // calls onPrepareOptionsMenu()
             }
         };

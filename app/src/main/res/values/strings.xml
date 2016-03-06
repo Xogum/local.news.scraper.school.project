@@ -20,5 +20,31 @@
     <string name="action_articles">Articles</string>
     <string name="title_activity_article">ArticleActivity</string>
     <string name="hello_world">Hello world!</string>
+    <string name="action_like">like</string>
+    <string name="action_share">share</string>
+    <string name="action_save">save</string>
+    <string name="action_favourite">favourite</string>
+    <string name="added_action">article added to %s</string>
+    <string name="share_with">Share article on</string>
+    <string name="empty_list">No results found</string>
+    <string name="title_activity_registration">Registration</string>
+    <string name="register">Register</string>
+    <string name="phone_number">Phone number</string>
+    <string name="username">Username</string>
+    <string name="tagline">News relevant to you</string>
+    <string name="tagline_register">Register easily to ge started</string>
+    <string name="title_activity_loading">LoadingActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="verificationMessage">This is just a message to verify your phonenumber for the News Scrapper application.</string>
+    <string name="action_import">Import existing account</string>
+    <string name="loading">Loading....</string>
+    <string name="logo">logo</string>
+    <string name="country_code">Country</string>
+    <string name="title_activity_test_db">TestDBActivity</string>
+    <string name="likes">Likes:</string>
+    <string name="favourites">Favourites:</string>
+    <string name="saves">Saves:</string>
+    <string name="reads">Reads:</string>
 
 </resources>

@@ -71,6 +71,12 @@ public class ArticleListAdapter extends BaseAdapter {
         TextView statusMsg = (TextView) convertView
                 .findViewById(R.id.txtStatusMsg);
         TextView url = (TextView) convertView.findViewById(R.id.txtUrl);
+        TextView id = (TextView) convertView.findViewById(R.id.txtId);
+
+        TextView likeCount = (TextView) convertView.findViewById(R.id.likeCount);
+        TextView readCount = (TextView) convertView.findViewById(R.id.readCount);
+        TextView saveCount = (TextView) convertView.findViewById(R.id.saveCount);
+
         NetworkImageView profilePic = (NetworkImageView) convertView
                 .findViewById(R.id.profilePic);
         FeedImageView feedImageView = (FeedImageView) convertView
@@ -80,13 +86,21 @@ public class ArticleListAdapter extends BaseAdapter {
 
         name.setText(item.title);
 
-        // Converting timestamp into x ago format
-        CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
-                Long.parseLong(item.date),
-                System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
-        timestamp.setText(timeAgo);
+        id.setText(String.valueOf(item.id));
 
-        // Check for empty status message
+        // date
+        // Converting timestamp into x ago format
+//        CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
+//                (long)(Float.parseFloat(item.date)*1000),
+//                System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
+        timestamp.setText(item.date);
+
+        // action counts
+        likeCount.setText(String.valueOf(item.likes));
+        saveCount.setText(String.valueOf(item.saves));
+        readCount.setText(String.valueOf(item.readz));
+
+        // Check for empty summary
         if (!TextUtils.isEmpty(item.summary)) {
             statusMsg.setText(item.summary);
             statusMsg.setVisibility(View.VISIBLE);
@@ -95,16 +109,16 @@ public class ArticleListAdapter extends BaseAdapter {
             statusMsg.setVisibility(View.GONE);
         }
 
-        // Checking for null feed url
-        if (item.url != null) {
-            url.setText(Html.fromHtml("<a href=\"" + item.url + "\">"
-                    + item.url + "</a> "));
+        // Checking for null feed link
+        if (item.link != null) {
+            url.setText(Html.fromHtml("<a href=\"" + item.link + "\">"
+                    + item.link + "</a> "));
 
-            // Making url clickable
+            // Making link clickable
             url.setMovementMethod(LinkMovementMethod.getInstance());
             url.setVisibility(View.VISIBLE);
         } else {
-            // url is null, remove from the view
+            // link is null, remove from the view
             url.setVisibility(View.GONE);
         }
 
@@ -112,8 +126,8 @@ public class ArticleListAdapter extends BaseAdapter {
         profilePic.setImageUrl(item.icon_url, imageLoader);
 
         // Feed image
-        if (item.image_url != null) {
-            feedImageView.setImageUrl(item.image_url, imageLoader);
+        if (item.image_link != null) {
+            feedImageView.setImageUrl(item.image_link, imageLoader);
             feedImageView.setVisibility(View.VISIBLE);
             feedImageView
                     .setResponseObserver(new FeedImageView.ResponseObserver() {

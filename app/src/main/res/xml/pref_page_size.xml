@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+<!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+     dismiss it. -->
+<!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+    <ListPreference
+        android:key="location"
+        android:title="@string/pref_location_title"
+        android:entries="@array/pref_location_titles"
+        android:entryValues="@array/pref_location_values"
+        android:defaultValue="53.8,2.6"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null" />
+    <ListPreference
+        android:key="radius"
+        android:title="@string/pref_title_radius"
+        android:entries="@array/pref_radius_titles"
+        android:entryValues="@array/pref_radius_values"
+        android:defaultValue="10"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null" />
+    <ListPreference
+        android:key="page_size"
+        android:title="@string/pref_title_search_page_size"
+        android:entries="@array/pref_search_page_size_titles"
+        android:entryValues="@array/pref_search_page_size_values"
+        android:defaultValue="10"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null" />
+
+    <ListPreference
+        android:key="category"
+        android:title="@string/pref_title_category"
+        android:entries="@array/pref_category_titles"
+        android:entryValues="@array/pref_category_values"
+        android:defaultValue=""
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null" />
+
+</PreferenceScreen>

@@ -45,6 +45,8 @@ public class RouteMaker {
             try {
                 params.put(field.getName(), field.get(object).toString());
             } catch (IllegalAccessException e) {
+            } catch (NullPointerException e){
+                params.put(field.getName(), "");
             }
         }
         return params;
@@ -56,8 +58,8 @@ public class RouteMaker {
      * @param user
      * @return request object
      */
-    public static OttoGsonRequest<User> postUser(final User user) {
-        return new OttoGsonRequest<User>(ServiceLocator.EventBus, Request.Method.POST, usersUrl, User.class) {
+    public static OttoGsonRequest<UserResponse> postUser(final User user) {
+        return new OttoGsonRequest<UserResponse>(ServiceLocator.EventBus, Request.Method.POST, usersUrl, UserResponse.class) {
             @Override
             protected Map<String, String> getParams() {
                 return makeParameterMap(user);
@@ -102,15 +104,15 @@ public class RouteMaker {
     /**
      * send a GET request to "/users/{uid}/{action}" to get articles by action for user
      *
-     * @param user
+     * @param userId
      * @param action
      * @return request object
      */
-    public static OttoGsonRequest<Article> gettUserAction(final User user, String action) {
-        return new OttoGsonRequest<Article>(ServiceLocator.EventBus,
+    public static OttoGsonRequest<ArticleListResponse> getUserAction(long userId, String action) {
+        return new OttoGsonRequest<ArticleListResponse>(ServiceLocator.EventBus,
                 Request.Method.GET,
-                String.format(userActionUrl, user.id, action),
-                Article.class);
+                String.format(userActionUrl, userId, action),
+                ArticleListResponse.class);
     }
     /**todo likely useless
      * send a GET request to "/users/{id}" to get user info
@@ -144,16 +146,13 @@ public class RouteMaker {
      * @param search
      * @return request object
      */
-    public static OttoGsonRequest<Article> getArticles(final Search search) {
-        return new OttoGsonRequest<Article>(ServiceLocator.EventBus,
+    public static OttoGsonRequest<ArticleListResponse> getArticles(final Search search) {
+        String url = articlesUrl + search.getQueryString();
+
+        return new OttoGsonRequest<ArticleListResponse>(ServiceLocator.EventBus,
                 Request.Method.GET,
-                articlesUrl,
-                Article.class) {
-            @Override
-            protected Map<String, String> getParams() {
-                return makeParameterMap(search);
-            }
-        };
+                url,
+                ArticleListResponse.class);
     }
     /**todo this route might not be needed if i render the article in a webview
      * send a GET request to "/articles/aid"
@@ -169,21 +168,35 @@ public class RouteMaker {
                 ActionResponse.class);
     }
     /**
-     * send a POST request to "/articles/{aid}/{action}"
+     * send a POST request to "/articles/{aid}/{action}/{uid}"
      * search
      *
-     * @param article
+     * @param articleId
      * @param action
      * @return request object
      */
-    public static OttoGsonRequest<ActionResponse> postArticleAction(final Article article, String action ) {
+    public static OttoGsonRequest<ActionResponse> postArticleAction(long articleId, String action, long userId ) {
         return new OttoGsonRequest<ActionResponse>(ServiceLocator.EventBus,
                 Request.Method.POST,
-                String.format(articleActionUrl, article.id, action),
+                String.format(articleUserUrl, articleId, action, userId),
                 ActionResponse.class);
     }
     /**
-     * send a GET request to test url
+     * send a DELETE request to "/articles/{aid}/{action}"
+     * search
+     *
+     * @param articleId
+     * @param action
+     * @return request object
+     */
+    public static OttoGsonRequest<ActionResponse> deleteArticleAction(long articleId, String action, long userId ) {
+        return new OttoGsonRequest<ActionResponse>(ServiceLocator.EventBus,
+                Request.Method.DELETE,
+                String.format(articleUserUrl, articleId, action, userId),
+                ActionResponse.class);
+    }
+    /**
+     * send a GET request to test link
      * search
      *
      * @return request object

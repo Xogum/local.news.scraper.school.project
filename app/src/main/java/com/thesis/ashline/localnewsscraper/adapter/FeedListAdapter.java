@@ -71,6 +71,7 @@ public class FeedListAdapter extends BaseAdapter {
         TextView statusMsg = (TextView) convertView
                 .findViewById(R.id.txtStatusMsg);
         TextView url = (TextView) convertView.findViewById(R.id.txtUrl);
+        TextView id = (TextView) convertView.findViewById(R.id.txtId);
         NetworkImageView profilePic = (NetworkImageView) convertView
                 .findViewById(R.id.profilePic);
         FeedImageView feedImageView = (FeedImageView) convertView
@@ -79,7 +80,7 @@ public class FeedListAdapter extends BaseAdapter {
         FeedItem item = feedItems.get(position);
 
         name.setText(item.name);
-
+        id.setText(String.valueOf(item.id));
         // Converting timestamp into x ago format
         CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
                 Long.parseLong(item.timeStamp),
@@ -95,16 +96,16 @@ public class FeedListAdapter extends BaseAdapter {
             statusMsg.setVisibility(View.GONE);
         }
 
-        // Checking for null feed url
+        // Checking for null feed link
         if (item.url != null && item.url != "" ) {
             url.setText(Html.fromHtml("<a href=\"" + item.url + "\">"
                     + item.url + "</a> "));
 
-            // Making url clickable
+            // Making link clickable
             url.setMovementMethod(LinkMovementMethod.getInstance());
             url.setVisibility(View.VISIBLE);
         } else {
-            // url is null, remove from the view
+            // link is null, remove from the view
             url.setVisibility(View.GONE);
         }
 
