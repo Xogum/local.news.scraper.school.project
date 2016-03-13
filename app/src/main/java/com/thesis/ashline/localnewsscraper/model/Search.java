@@ -31,7 +31,7 @@ public class Search {
 
         if(!sortParams.isEmpty()) {
             for(Map.Entry<String, Boolean> entry : sortParams.entrySet()) {
-                sortUrlSegment += "," + entry.getKey();
+                sortUrlSegment += "." + entry.getKey();
                 if(entry.getValue()) {
                     sortUrlSegment += "_desc";
                 }
