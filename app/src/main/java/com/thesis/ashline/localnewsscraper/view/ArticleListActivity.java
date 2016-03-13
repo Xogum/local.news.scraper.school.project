@@ -206,7 +206,9 @@ public class ArticleListActivity extends ActionBarActivity
         if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
             startLocationUpdates();
         }
-        //todo maybe if loading show loader
+        
+        placeholderFragment.initialiseLists();
+        onSectionAttached(currentList, true);
     }
 
     @Override
@@ -714,9 +716,7 @@ public class ArticleListActivity extends ActionBarActivity
         String location;
         String[] coordinates;
 
-        if(search == null) {
-            search = new Search();
-        }
+        search = new Search();
 
         if(prefs == null) {
             prefs = PreferenceManager.getDefaultSharedPreferences(this);
