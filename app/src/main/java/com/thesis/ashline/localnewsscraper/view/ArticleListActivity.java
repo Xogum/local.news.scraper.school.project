@@ -749,7 +749,7 @@ public class ArticleListActivity extends ActionBarActivity
         }
 
         if(prefs.getBoolean("order_by_reads", false)) {
-            search.putSortParameter("reads", prefs.getBoolean("order_by_reads_descending", false));
+            search.putSortParameter("readz", prefs.getBoolean("order_by_reads_descending", false));
         }
 
         if(prefs.getBoolean("order_by_distance", false)) {
