@@ -27,7 +27,7 @@
     <string name="action_favourite">favourite</string>
     <string name="added_action">article added to %s</string>
     <string name="share_with">Share article on</string>
-    <string name="empty_list">No results found</string>
+    <string name="empty_list">Loading....</string>
     <string name="title_activity_registration">Registration</string>
     <string name="register">Register</string>
     <string name="phone_number">Phone number</string>
@@ -47,5 +47,6 @@
     <string name="favourites">Favourites:</string>
     <string name="saves">Saves:</string>
     <string name="reads">Reads:</string>
+    <string name="load_more">load more</string>
 
 </resources>

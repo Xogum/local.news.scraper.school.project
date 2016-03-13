@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,7 +55,6 @@ import com.thesis.ashline.localnewsscraper.model.TestFeedResponse.FeedItem;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 public class ArticleListActivity extends ActionBarActivity
@@ -84,12 +84,14 @@ public class ArticleListActivity extends ActionBarActivity
     private final int LIKES = 3;
     private final int FAVOURITES = 4;
     private final int SAVES = 5;
-    private final int SHARES = 6;
-    private final int TEST = 7;
+    private final int TEST = 6;
+
     private int currentList = -1;
+    private int pageOffset = 0;
+
     private SharedPreferences prefs;
     private Search search;
-    private final String[] actions = {"", "", "reads", "likes", "favourites", "saves", "shares"};
+    private final String[] actions = {"", "", "reads", "likes", "favourites", "saves"};
 //    private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private TextView mLocationText;
@@ -361,71 +363,59 @@ public class ArticleListActivity extends ActionBarActivity
                 .commit();
     }
 
-    public void onSectionAttached(int number) {
+    public void onSectionAttached(int number, boolean resetPage) {
+        pageOffset = currentList == number && !resetPage ? pageOffset : 0;
+
+        currentList = number;
+
+        switch (number) {
+            case SEARCH:
+                dispatchRequest(SEARCH, getString(R.string.title_section1));
+                break;
+            case READS:
+                dispatchRequest(READS, getString(R.string.title_section2));
+                break;
+            case LIKES:
+                dispatchRequest(LIKES, getString(R.string.title_section3));;
+                break;
+            case FAVOURITES:
+                dispatchRequest(FAVOURITES, getString(R.string.title_section4));
+                break;
+            case SAVES:
+                dispatchRequest(SAVES, getString(R.string.title_section5));
+                break;
+            case TEST:
+                dispatchRequest(TEST, getString(R.string.title_section7));
+                break;
+        }
+    }
+
+    private void dispatchRequest(int action, String title) {
         OttoGsonRequest<TestFeedResponse> testRequest;
         OttoGsonRequest<ArticleListResponse> articleRequest;
 
-        currentList = number;
-        switch (number) {
-            case SEARCH:
-                mTitle = getString(R.string.title_section1);
-//                onActionSelected(SEARCH);
-                search = getSearch();
+        mTitle = title;
+        search = getSearch();
 
+        switch(action) {
+            case SEARCH:
                 articleRequest = RouteMaker.getArticles(search);
-                Log.d("OVDR", "Request begin: " + articleRequest.requestId);
-                ServiceLocator.VolleyRequestQueue.add(articleRequest);
-                updateUiForRequestSent(articleRequest);
-                break;
-            case READS:
-                mTitle = getString(R.string.title_section2);
-//                onActionSelected(READS);
-                articleRequest = RouteMaker.getUserAction(userId, actions[READS]);
-                Log.d("OVDR", "Request begin: " + articleRequest.requestId);
-                ServiceLocator.VolleyRequestQueue.add(articleRequest);
-                updateUiForRequestSent(articleRequest);
-                break;
-            case LIKES:
-                mTitle = getString(R.string.title_section3);
-//                onActionSelected(LIKES);
-                articleRequest = RouteMaker.getUserAction(userId, actions[LIKES]);
-                Log.d("OVDR", "Request begin: " + articleRequest.requestId);
-                ServiceLocator.VolleyRequestQueue.add(articleRequest);
-                updateUiForRequestSent(articleRequest);
-                break;
-            case FAVOURITES:
-                mTitle = getString(R.string.title_section4);
-//                onActionSelected(FAVOURITES);
-                articleRequest = RouteMaker.getUserAction(userId, actions[FAVOURITES]);
-                Log.d("OVDR", "Request begin: " + articleRequest.requestId);
-                ServiceLocator.VolleyRequestQueue.add(articleRequest);
-                updateUiForRequestSent(articleRequest);
-                break;
-            case SAVES:
-                mTitle = getString(R.string.title_section5);
-//                onActionSelected(SAVES);
-                articleRequest = RouteMaker.getUserAction(userId, actions[SAVES]);
-                Log.d("OVDR", "Request begin: " + articleRequest.requestId);
-                ServiceLocator.VolleyRequestQueue.add(articleRequest);
-                updateUiForRequestSent(articleRequest);
-                break;
-            case SHARES:
-                mTitle = getString(R.string.title_section6);
-//                onActionSelected(SHARES);
-                articleRequest = RouteMaker.getUserAction(userId, actions[SHARES]);
-                Log.d("OVDR", "Request begin: " + articleRequest.requestId);
-                ServiceLocator.VolleyRequestQueue.add(articleRequest);
-                updateUiForRequestSent(articleRequest);
                 break;
             case TEST:
-                mTitle = getString(R.string.title_section7);
-//                onActionSelected(TEST);
                 testRequest = RouteMaker.getTestFeed();
                 Log.d("OVDR", "Request begin: " + testRequest.requestId);
                 ServiceLocator.VolleyRequestQueue.add(testRequest);
                 updateUiForRequestSent(testRequest);
-                break;
+                return;
+            default:
+                articleRequest = RouteMaker.getUserAction(userId, actions[action], search);
+
         }
+
+        Log.d("OVDR", "Request begin: " + articleRequest.requestId);
+        ServiceLocator.VolleyRequestQueue.add(articleRequest);
+        updateUiForRequestSent(articleRequest);
+
     }
 
     public void restoreActionBar() {
@@ -459,7 +449,8 @@ public class ArticleListActivity extends ActionBarActivity
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_refresh:
-                onSectionAttached(currentList);
+                placeholderFragment.initialiseLists();
+                onSectionAttached(currentList, true);
                 return true;
             case R.id.action_settings:
                 openSettings();
@@ -726,6 +717,7 @@ public class ArticleListActivity extends ActionBarActivity
         if(search == null) {
             search = new Search();
         }
+
         if(prefs == null) {
             prefs = PreferenceManager.getDefaultSharedPreferences(this);
         }
@@ -734,6 +726,9 @@ public class ArticleListActivity extends ActionBarActivity
         search.put("category_id", prefs.getString("category", ""));
         search.put("radius", prefs.getString("radius", ""));
         search.put("date_from", prefs.getString("date_from", ""));
+        // pagination
+        search.put("offset", pageOffset * Integer.parseInt(prefs.getString("page_size", "10")));
+        search.put("limit", prefs.getString("page_size", "10"));
 
         if(!prefs.getBoolean("date_to_today", false)) {
             search.put("date_to", prefs.getString("date_to", ""));
@@ -768,6 +763,11 @@ public class ArticleListActivity extends ActionBarActivity
         return search;
     }
 
+    private void fetchMoreArticles() {
+        pageOffset += 1;
+        onSectionAttached(currentList, false);
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -782,6 +782,8 @@ public class ArticleListActivity extends ActionBarActivity
          */
         private TextView textView;
         private ListView listView;
+        private Button btnLoadMore;
+        private View loadingSpinner;
         private ArticleListAdapter articleListAdapter;
         private FeedListAdapter feedListAdapter;
         private List<FeedItem> feedItems;
@@ -789,6 +791,7 @@ public class ArticleListActivity extends ActionBarActivity
         private Context applicationContext;
         private static final String TAG = ArticleListActivity.class.getSimpleName();
         private List<Article> articleList;
+        private ArticleListActivity parentActivity;
 
 
         /**
@@ -812,15 +815,30 @@ public class ArticleListActivity extends ActionBarActivity
                                  Bundle savedInstanceState) {
             Log.d("zection", "" + getArguments().getInt(ARG_SECTION_NUMBER));
             View rootView = inflater.inflate(R.layout.fragment_article_list, container, false);
+
             applicationContext = this.getActivity().getApplicationContext();
+            parentActivity = (ArticleListActivity) this.getActivity();
 
             listView = (ListView) rootView.findViewById(R.id.list);
             listView.setEmptyView(rootView.findViewById(R.id.emptyElement));
-            feedItems = new ArrayList<FeedItem>();
-            articleList = new ArrayList<Article>();
+            listView.setOnItemClickListener(this);
 
-            feedListAdapter = new FeedListAdapter(this.getActivity(), feedItems);
-            articleListAdapter = new ArticleListAdapter(this.getActivity(), articleList);
+            btnLoadMore = (Button) inflater.inflate(R.layout.load_more_button, listView, false);
+            btnLoadMore.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    fetchMoreArticles();
+                }
+            });
+
+            loadingSpinner = inflater.inflate(R.layout.loading_spinner, listView, false);
+            listView.addFooterView(loadingSpinner, null, false);
+
+            listView.addFooterView(btnLoadMore);
+
+            loadingSpinner.setVisibility(View.GONE);
+
+            initialiseLists();
 
             return rootView;
         }
@@ -832,18 +850,12 @@ public class ArticleListActivity extends ActionBarActivity
             Intent intent = new Intent(this.getActivity(), ArticleActivity.class);
             Article article = (Article) adapterView.getAdapter().getItem(i);
 
-            // add link to intent extras
-            TextView urlTextView = (TextView) view.findViewById(R.id.txtUrl);
-//        TextView idTextView = (TextView) view.findViewById(R.id.txtId);
             // increase readCount
             TextView readCountTextView = (TextView) view.findViewById(R.id.readCount);
             count += Integer.parseInt(readCountTextView.getText().toString());
             readCountTextView.setText(String.valueOf(count));
 
-            String url = urlTextView.getText().toString();
-//        String id = idTextView.getText().toString();
-
-            intent.putExtra("article_url", url);
+            intent.putExtra("article_url", article.link);
             intent.putExtra("article_id", article.id);
             intent.putExtra("iliked", article.iliked);
             intent.putExtra("isaved", article.isaved);
@@ -856,7 +868,23 @@ public class ArticleListActivity extends ActionBarActivity
         public void onAttach(Activity activity) {
             super.onAttach(activity);
             ((ArticleListActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
+                    getArguments().getInt(ARG_SECTION_NUMBER), true);
+        }
+
+        private void initialiseLists() {
+            feedItems = new ArrayList<FeedItem>();
+            articleList = new ArrayList<Article>();
+
+            feedListAdapter = new FeedListAdapter(this.getActivity(), feedItems);
+            articleListAdapter = new ArticleListAdapter(this.getActivity(), articleList);
+
+            listView.setAdapter(articleListAdapter);
+        }
+
+        public void fetchMoreArticles() {
+            btnLoadMore.setVisibility(View.GONE);
+            loadingSpinner.setVisibility(View.VISIBLE);
+            parentActivity.fetchMoreArticles();
         }
 
         public void renderTestItems(ArrayList<FeedItem> feed) {
@@ -868,11 +896,18 @@ public class ArticleListActivity extends ActionBarActivity
 
         public void renderArticles(ArrayList<Article> articles) {
             //todo handle different responses, shares/likes etc
-            listView.setAdapter(articleListAdapter);
-            listView.setOnItemClickListener(this);
+
             this.articleList.addAll(articles);
             // notify data changes to list adapter
             articleListAdapter.notifyDataSetChanged();
+
+            if(articles.size() == 0) {
+                btnLoadMore.setVisibility(View.GONE);
+            } else {
+                btnLoadMore.setVisibility(View.VISIBLE);
+            }
+
+            loadingSpinner.setVisibility(View.GONE);
 
         }
 //        todo add response subscriptions etc and test api calls

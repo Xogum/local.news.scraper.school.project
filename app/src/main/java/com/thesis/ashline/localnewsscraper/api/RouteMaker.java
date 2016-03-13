@@ -108,10 +108,12 @@ public class RouteMaker {
      * @param action
      * @return request object
      */
-    public static OttoGsonRequest<ArticleListResponse> getUserAction(long userId, String action) {
+    public static OttoGsonRequest<ArticleListResponse> getUserAction(long userId, String action, Search search) {
+        String url = String.format(userActionUrl, userId, action) + search.getPaginationUrlSegment();
+
         return new OttoGsonRequest<ArticleListResponse>(ServiceLocator.EventBus,
                 Request.Method.GET,
-                String.format(userActionUrl, userId, action),
+                url,
                 ArticleListResponse.class);
     }
     /**todo likely useless

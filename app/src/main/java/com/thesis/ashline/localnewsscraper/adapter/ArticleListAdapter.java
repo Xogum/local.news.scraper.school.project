@@ -110,7 +110,7 @@ public class ArticleListAdapter extends BaseAdapter {
         // Checking for null feed link
         if (item.link != null) {
             url.setText(Html.fromHtml("<a href=\"" + item.link + "\">"
-                    + item.link + "</a> "));
+                    + "open in browser" + "</a> "));
 
             // Making link clickable
             url.setMovementMethod(LinkMovementMethod.getInstance());

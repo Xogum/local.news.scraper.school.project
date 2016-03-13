@@ -55,5 +55,14 @@ public class Search {
         return sortParams.put(key, value);
     }
 
+    public String getPaginationUrlSegment() {
+        String url;
+        String offset = String.valueOf(params.get("offset"));
+        String limit = String.valueOf(params.get("limit"));
+
+        url = "?offset=" + offset + "&limit=" + limit;
+
+        return url;
+    }
 }
 
