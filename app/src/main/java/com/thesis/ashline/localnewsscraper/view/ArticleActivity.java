@@ -38,13 +38,16 @@ public class ArticleActivity extends ActionBarActivity {
     boolean iliked;
     boolean isaved;
     boolean ifavourited;
+    boolean iread;
     public static final int REGISTER_MODE = 1;
     private ActivityViewModel _model;
     private ShareActionProvider mShareActionProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        getWindow().requestFeature(Window.FEATURE_PROGRESS);
+//        getWindow().requestFeature(Window.FEATURE_PROGRESS);
+        this.requestWindowFeature(Window.FEATURE_PROGRESS);
+        this.setProgressBarVisibility(true);
         super.onCreate(savedInstanceState);
         //            ----------------------
         ServiceLocator.ensureInitialized(this);
@@ -57,6 +60,7 @@ public class ArticleActivity extends ActionBarActivity {
             iliked = (b.getInt("iliked") != 0);
             isaved = (b.getInt("isaved") != 0);
             ifavourited = (b.getInt("ifavourited") != 0);
+            iread = (b.getInt("iread") != 0);
         }
         SharedPreferences settings = getSharedPreferences(LoadingActivity.USER_DATA, Context.MODE_PRIVATE);
         userId = settings.getLong("user_id", 0);
@@ -83,7 +87,9 @@ public class ArticleActivity extends ActionBarActivity {
 
         loadWebviewContent();
         setContentView(webview);
-        markArticleAsRead();
+        if(!iread) {
+            markArticleAsRead();
+        }
 
     }
 

@@ -29,8 +29,10 @@ import android.widget.Toast;
 import com.thesis.ashline.localnewsscraper.R;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -64,10 +66,34 @@ public class NavigationDrawerFragment extends Fragment {
     private ListView mDrawerListView;
     private View mFragmentContainerView;
     private TextView mLocationTextView;
+    private TextView mSelectedLocationTextView;
 
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
+    private SharedPreferences sp;
+    private Map<String,String> locationMap = new HashMap<String, String>()
+    {
+        {
+            put("53.8,2.6", "lancashire");
+            put("53.6454,3.0083", "southport");
+            put("53.789,2.248", "burnley");
+            put("53.653,2.632", "chorley");
+            put("53.692,2.697", "leyland");
+            put("53.7632,2.7031", "preston");
+            put("53.8711,2.3916", "clitheroe");
+            put("53.95,2.02", "craven");
+            put("53.7534,2.3638", "accrington");
+            put("54.047,2.801", "lancaster");
+            put("53.7426,2.997", "lytham");
+            put("53.869,2.164", "pendle");
+            put("53.6833,2.25", "rossendale");
+            put("53.6833,2.25", "garstang");
+            put("53.8142,3.0503", "blackpool");
+            put("53.8833,2.4", "ribble valley");
+            put("54.064,2.8786", "morecambe");
+        }
+    };
 
     public NavigationDrawerFragment() {
     }
@@ -76,10 +102,10 @@ public class NavigationDrawerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
         // Read in the flag indicating whether or not the user has demonstrated awareness of the
         // drawer. See PREF_USER_LEARNED_DRAWER for details.
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
         mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);
 
         if (savedInstanceState != null) {
@@ -105,6 +131,7 @@ public class NavigationDrawerFragment extends Fragment {
                 R.layout.fragment_navigation_drawer, container, false);
         mDrawerListView = (ListView) view.findViewById(R.id.filterList);
         mLocationTextView = (TextView) view.findViewById(R.id.locationText);
+        mSelectedLocationTextView = (TextView) view.findViewById(R.id.selectedLocationText);
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -174,25 +201,40 @@ public class NavigationDrawerFragment extends Fragment {
                 if (!isAdded()) {
                     return;
                 }
+                if (sp == null) {
+                    sp = PreferenceManager
+                            .getDefaultSharedPreferences(getActivity());
+                }
 
                 if (!mUserLearnedDrawer) {
                     // The user manually opened the drawer; store this flag to prevent auto-showing
                     // the navigation drawer automatically in the future.
                     mUserLearnedDrawer = true;
-                    SharedPreferences sp = PreferenceManager
-                            .getDefaultSharedPreferences(getActivity());
+
                     sp.edit().putBoolean(PREF_USER_LEARNED_DRAWER, true).commit();
                 }
                 SharedPreferences settings = getActivity()
                         .getSharedPreferences(LoadingActivity.USER_DATA, Context.MODE_PRIVATE);
+
                 Float locationLng = settings.getFloat("user_location_lng", 0);
                 Float locationLat = settings.getFloat("user_location_lat", 0);
                 String locationString = "lat: " + String.valueOf(locationLat) +
                         "\nlng: " + String.valueOf(locationLng);
 
+                String location = sp.getString("location", "");
+
+                if(!"".equals(location)) {
+                    String selectedLocationString;
+                    String[] coordinates = location.split(",");
+                    selectedLocationString = "lat: " + coordinates[0] +
+                            "\nlng: " + coordinates[1] + "\n" + locationMap.get(location);
+                    mSelectedLocationTextView.setText(selectedLocationString);
+                }
+
                 Geocoder gcd = new Geocoder( drawerView.getContext(), Locale.getDefault());
 
                 List<Address> addresses = null;
+
                 try {
                     addresses = gcd.getFromLocation(locationLat, locationLng, 1);
                 } catch (IOException e) {
@@ -202,8 +244,12 @@ public class NavigationDrawerFragment extends Fragment {
                 if (addresses.size() > 0)
                     locationString += "\n" + addresses.get(0).getLocality();
 
-
                 mLocationTextView.setText(locationString);
+
+                if ("".equals(location)) {
+                    mSelectedLocationTextView.setText(locationString);
+                }
+
                 getActivity().supportInvalidateOptionsMenu(); // calls onPrepareOptionsMenu()
             }
         };

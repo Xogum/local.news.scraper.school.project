@@ -95,6 +95,7 @@ public class ArticleListActivity extends ActionBarActivity
 //    private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private TextView mLocationText;
+    private boolean shouldRefreshList = true;
     /**
      * Constant used in the location settings dialog.
      */
@@ -206,9 +207,13 @@ public class ArticleListActivity extends ActionBarActivity
         if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
             startLocationUpdates();
         }
-        
-        placeholderFragment.initialiseLists();
-        onSectionAttached(currentList, true);
+
+        if(shouldRefreshList) {
+            placeholderFragment.initialiseLists();
+            onSectionAttached(currentList, true);
+        }
+
+        shouldRefreshList = true;
     }
 
     @Override
@@ -327,7 +332,6 @@ public class ArticleListActivity extends ActionBarActivity
 
     @Subscribe
     public void onResponseError(VolleyRequestFailed message) {
-        //todo test this
         Toast.makeText(this, "Network request Error", Toast.LENGTH_SHORT).show();
     }
 
@@ -722,7 +726,6 @@ public class ArticleListActivity extends ActionBarActivity
             prefs = PreferenceManager.getDefaultSharedPreferences(this);
         }
 
-        search.put("user_id", userId);
         search.put("category_id", prefs.getString("category", ""));
         search.put("radius", prefs.getString("radius", ""));
         search.put("date_from", prefs.getString("date_from", ""));
@@ -741,6 +744,13 @@ public class ArticleListActivity extends ActionBarActivity
             coordinates = location.split(",");
             search.put("lat", coordinates[0]);
             search.put("lng", coordinates[1]);
+        } else {
+            SharedPreferences settings = this
+                    .getSharedPreferences(LoadingActivity.USER_DATA, Context.MODE_PRIVATE);
+            Float locationLng = settings.getFloat("user_location_lng", 0);
+            Float locationLat = settings.getFloat("user_location_lat", 0);
+            search.put("lat", locationLat);
+            search.put("lng", locationLng);
         }
 
         // sorting
@@ -850,16 +860,23 @@ public class ArticleListActivity extends ActionBarActivity
             Intent intent = new Intent(this.getActivity(), ArticleActivity.class);
             Article article = (Article) adapterView.getAdapter().getItem(i);
 
-            // increase readCount
-            TextView readCountTextView = (TextView) view.findViewById(R.id.readCount);
-            count += Integer.parseInt(readCountTextView.getText().toString());
-            readCountTextView.setText(String.valueOf(count));
 
             intent.putExtra("article_url", article.link);
             intent.putExtra("article_id", article.id);
             intent.putExtra("iliked", article.iliked);
             intent.putExtra("isaved", article.isaved);
             intent.putExtra("ifavourited", article.ifavourited);
+            intent.putExtra("iread", article.iread);
+
+            // increase readCount
+            if(article.iread == 0) {
+                TextView readCountTextView = (TextView) view.findViewById(R.id.readCount);
+                count += Integer.parseInt(readCountTextView.getText().toString());
+                readCountTextView.setText(String.valueOf(count));
+                article.iread = 1;
+            }
+
+            parentActivity.shouldRefreshList = false;
 
             startActivity(intent);
         }

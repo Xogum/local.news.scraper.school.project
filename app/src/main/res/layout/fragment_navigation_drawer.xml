@@ -17,12 +17,23 @@
     tools:context="com.thesis.ashline.localnewsscraper.view.NavigationDrawerFragment" />
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="30dp"
         android:textColor="@color/white"
-        android:text="Location:"/>
+        android:text="Current Location:"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:textColor="@color/white"
         android:id="@+id/locationText"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/white"
+        android:text="Selected Location:"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:textColor="@color/white"
+        android:id="@+id/selectedLocationText"/>
 </LinearLayout>
