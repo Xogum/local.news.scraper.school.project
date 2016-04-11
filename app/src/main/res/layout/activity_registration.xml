@@ -38,7 +38,7 @@
         <LinearLayout
             android:id="@+id/footer"
             android:layout_width="fill_parent"
-            android:layout_height="100dip"
+            android:layout_height="60dip"
             android:layout_alignParentBottom="true">
 
             <TextView
@@ -103,6 +103,11 @@
                 android:ems="10"
                 android:inputType="phone" />
             <!-- Login button -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_margin="5dp"
+                android:text="Phone number is used for verification purposes only, it will not be used for anything else."
+                android:layout_height="wrap_content" />
 
             <Button
                 android:id="@+id/btnRegister"

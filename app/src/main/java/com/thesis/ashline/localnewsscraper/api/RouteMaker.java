@@ -109,7 +109,7 @@ public class RouteMaker {
      * @return request object
      */
     public static OttoGsonRequest<ArticleListResponse> getUserAction(long userId, String action, Search search) {
-        String url = String.format(userActionUrl, userId, action) + search.getPaginationUrlSegment();
+        String url = String.format(userActionUrl, userId, action) + search.getUserActionUrlSegment();
 
         return new OttoGsonRequest<ArticleListResponse>(ServiceLocator.EventBus,
                 Request.Method.GET,

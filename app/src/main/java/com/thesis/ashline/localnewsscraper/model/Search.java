@@ -55,12 +55,14 @@ public class Search {
         return sortParams.put(key, value);
     }
 
-    public String getPaginationUrlSegment() {
+    public String getUserActionUrlSegment() {
         String url;
         String offset = String.valueOf(params.get("offset"));
         String limit = String.valueOf(params.get("limit"));
+        String lng = String.valueOf(params.get("lng"));
+        String lat = String.valueOf(params.get("lat"));
 
-        url = "?offset=" + offset + "&limit=" + limit;
+        url = "?offset=" + offset + "&limit=" + limit + "&lng=" + lng + "&lat=" + lat;
 
         return url;
     }

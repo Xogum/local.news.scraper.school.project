@@ -75,23 +75,23 @@ public class NavigationDrawerFragment extends Fragment {
     private Map<String,String> locationMap = new HashMap<String, String>()
     {
         {
-            put("53.8,2.6", "lancashire");
-            put("53.6454,3.0083", "southport");
-            put("53.789,2.248", "burnley");
-            put("53.653,2.632", "chorley");
-            put("53.692,2.697", "leyland");
-            put("53.7632,2.7031", "preston");
-            put("53.8711,2.3916", "clitheroe");
-            put("53.95,2.02", "craven");
-            put("53.7534,2.3638", "accrington");
-            put("54.047,2.801", "lancaster");
-            put("53.7426,2.997", "lytham");
-            put("53.869,2.164", "pendle");
-            put("53.6833,2.25", "rossendale");
-            put("53.6833,2.25", "garstang");
-            put("53.8142,3.0503", "blackpool");
-            put("53.8833,2.4", "ribble valley");
-            put("54.064,2.8786", "morecambe");
+            put("53.8,-2.6", "lancashire");
+            put("53.6454,-3.0083", "southport");
+            put("53.789,-2.248", "burnley");
+            put("53.653,-2.632", "chorley");
+            put("53.692,-2.697", "leyland");
+            put("53.7632,-2.7031", "preston");
+            put("53.8711,-2.3916", "clitheroe");
+            put("53.95,-2.02", "craven");
+            put("53.7534,-2.3638", "accrington");
+            put("54.047,-2.801", "lancaster");
+            put("53.7426,-2.997", "lytham");
+            put("53.869,-2.164", "pendle");
+            put("53.6833,-2.25", "rossendale");
+            put("53.6833,-2.25", "garstang");
+            put("53.8142,-3.0503", "blackpool");
+            put("53.8833,-2.4", "ribble valley");
+            put("54.064,-2.8786", "morecambe");
         }
     };
 
@@ -237,12 +237,12 @@ public class NavigationDrawerFragment extends Fragment {
 
                 try {
                     addresses = gcd.getFromLocation(locationLat, locationLng, 1);
+                    if (addresses.size() > 0)
+                        locationString += "\n" + addresses.get(0).getLocality();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-                if (addresses.size() > 0)
-                    locationString += "\n" + addresses.get(0).getLocality();
 
                 mLocationTextView.setText(locationString);
 
