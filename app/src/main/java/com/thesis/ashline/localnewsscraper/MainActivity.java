@@ -9,7 +9,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.thesis.ashline.localnewsscraper.database.DB;
 import com.thesis.ashline.localnewsscraper.view.ArticleListActivity;
 import com.thesis.ashline.localnewsscraper.view.LoadingActivity;
 import com.thesis.ashline.localnewsscraper.view.RegistrationActivity;
@@ -19,24 +18,17 @@ import java.io.IOException;
 
 
 public class MainActivity extends ActionBarActivity {
-    DB db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // init preferences
         initialiseSettings();
-        db = new DB(this);
 //        testDB();
         if (userExists()) {
             openArticleList();
         } else {
-            try {
-                db.create();
-                openRegistration();
-            } catch (IOException e) {
-                //show alert
-            }
+            openRegistration();
         }
     }
 

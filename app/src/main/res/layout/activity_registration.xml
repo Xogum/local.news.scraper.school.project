@@ -72,43 +72,22 @@
                 android:layout_marginBottom="20dip"
                 android:layout_marginTop="5dip"
                 android:singleLine="true" />
-            <!--  Phone number Label -->
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/country_code"
-                android:textColor="#372c24" />
-
-
-            <Spinner
-                android:id="@+id/country_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20sp"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:layout_marginTop="20sp"></Spinner>
+            <!--  email Label -->
 
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/phone_number"
+                android:text="@string/email"
                 android:textColor="#372c24" />
 
             <EditText
-                android:id="@+id/txtPhone"
+                android:id="@+id/txtEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:ems="10"
-                android:inputType="phone" />
+                android:inputType="textEmailAddress" />
             <!-- Login button -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_margin="5dp"
-                android:text="Phone number is used for verification purposes only, it will not be used for anything else."
-                android:layout_height="wrap_content" />
-
             <Button
                 android:id="@+id/btnRegister"
                 android:layout_width="fill_parent"

@@ -1,12 +1,24 @@
 package com.thesis.ashline.localnewsscraper.view;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Toast;
+
 import com.android.volley.NetworkResponse;
-import com.android.volley.ParseError;
-import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.squareup.otto.Subscribe;
+import com.thesis.ashline.localnewsscraper.R;
 import com.thesis.ashline.localnewsscraper.api.OttoGsonRequest;
 import com.thesis.ashline.localnewsscraper.api.RouteMaker;
 import com.thesis.ashline.localnewsscraper.api.ServiceLocator;
@@ -17,30 +29,7 @@ import com.thesis.ashline.localnewsscraper.model.User;
 import com.thesis.ashline.localnewsscraper.model.UserResponse;
 import com.thesis.ashline.localnewsscraper.view.util.SystemUiHider;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.telephony.PhoneNumberUtils;
-import android.telephony.SmsManager;
-import android.telephony.SmsMessage;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.Toast;
-
-import com.thesis.ashline.localnewsscraper.R;
-
-import org.apache.http.protocol.HTTP;
-
 import java.io.UnsupportedEncodingException;
-import java.util.Map;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -49,7 +38,6 @@ import java.util.Map;
  * @see SystemUiHider
  */
 public class LoadingActivity extends Activity {
-    private BroadcastReceiver receiver;
     public static final String USER_DATA = "user_data";
     public static final int REGISTER_MODE = 1;
     private ActivityViewModel _model;
@@ -153,52 +141,25 @@ public class LoadingActivity extends Activity {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
-        // SMS shit//////////////////////////////
+
         Bundle b = getIntent().getExtras();
         if (b != null) {
             int mode = b.getInt("mode");
             switch (mode) {
                 case REGISTER_MODE:
-                    final String phonenumber = b.getString("phone");
+                    final String email = b.getString("email");
                     final String username = b.getString("username");
-                    IntentFilter filter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
-                    receiver = new BroadcastReceiver() {
-
-                        @Override
-                        public void onReceive(Context context, Intent intent) {
-                            Bundle extras = intent.getExtras();
-
-                            if (extras == null)
-                                return;
-
-                            Object[] pdus = (Object[]) extras.get("pdus");
-                            SmsMessage msg = SmsMessage.createFromPdu((byte[]) pdus[0]);
-                            String origNumber = msg.getOriginatingAddress();
-//                            String msgBody = msg.getMessageBody();
-//                checkIf sms came from app
-                            if (PhoneNumberUtils.compare(phonenumber, origNumber)) {
-                                Toast.makeText(getApplicationContext(), "Number verified", Toast.LENGTH_LONG).show();
-                                //send user registration call
-                                postUserRegistration(username, phonenumber);
-
-                                //store user id in preferences
-                                //proceed to article list
-                            }
-                        }
-                    };
-                    registerReceiver(receiver, filter);
-                    sendSms(phonenumber);
+                    postUserRegistration(username, email);
                     break;
-
             }
         }
     }
 
-    private void postUserRegistration(String username, String phonenumber) {
+    private void postUserRegistration(String username, String email) {
         OttoGsonRequest<UserResponse> userRequest;
         User user = new User();
         user.username = username;
-        user.phone_number = phonenumber;
+        user.email = email;
         userRequest = RouteMaker.postUser(user);
         ServiceLocator.VolleyRequestQueue.add(userRequest);
     }
@@ -260,7 +221,7 @@ public class LoadingActivity extends Activity {
         SharedPreferences.Editor editor = settings.edit();
         editor.putLong("user_id", user.id);
         editor.putString("user_username", user.username);
-        editor.putString("user_phonenumber", user.phone_number);
+        editor.putString("user_email", user.email);
         editor.commit();
     }
 
@@ -310,11 +271,6 @@ public class LoadingActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        try {
-            unregisterReceiver(receiver);
-        } catch (IllegalArgumentException e) {
-//            e.printStackTrace();
-        }
     }
 
     @Override
@@ -355,19 +311,6 @@ public class LoadingActivity extends Activity {
         } else {
             ServiceLocator.ResponseBuffer.startSaving();
             ServiceLocator.EventBus.unregister(this);
-        }
-    }
-
-    private void sendSms(String number) {
-        String msg = getResources().getString(R.string.verificationMessage);
-        SmsManager sm = SmsManager.getDefault();
-        try {
-            sm.sendTextMessage(number, null, msg, null, null);
-        } catch (Exception e) {
-            Toast.makeText(this, "Your sms has failed...",
-                    Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-            openRegistration();
         }
     }
 }
