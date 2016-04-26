@@ -726,6 +726,7 @@ public class ArticleListActivity extends ActionBarActivity
             prefs = PreferenceManager.getDefaultSharedPreferences(this);
         }
 
+        search.put("user_id", userId);
         search.put("category_id", prefs.getString("category", ""));
         search.put("radius", prefs.getString("radius", ""));
         search.put("date_from", prefs.getString("date_from", ""));
